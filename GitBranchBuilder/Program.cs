@@ -1,7 +1,11 @@
-﻿using LibGit2Sharp;
+﻿using Autofac;
+using GitBranchBuilder.Jobs;
+using LibGit2Sharp;
+using LibGit2Sharp.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,71 +13,73 @@ namespace GitBranchBuilder
 {
     class Program
     {
-        static readonly char[] branchNameSplitters = new[] { '-', '_' };
-
-        static string GetNumber(string branchName)
+        static IContainer BuildAutofacContainer()
         {
-            var parts = branchName.Split(branchNameSplitters);
+            var builder = new ContainerBuilder();
 
-            if (parts.Length > 1)
-            {
-                var start = parts[0].ToUpperInvariant();
+            builder.RegisterAssemblyTypes(Assembly.GetCallingAssembly())
+                .Where(x => !x.IsInterface)
+                .AsSelf()
+                .AsImplementedInterfaces()
+                .SingleInstance();
 
-                if (start == "URCC" || start == "CRC")
-                {
-                    return parts[1].PadLeft(3, '0');
-                }
-
-                return "unknown project name";
-            }
-
-            return string.Empty;
+            return builder.Build();
         }
 
+        static async Task<string> ExecuteJobAsync(IJob job)
+        {
+            void executeJob()
+            {
+                job.Prepare();
+                Console.WriteLine($"Getting job done. {job.Description}");
+                job.Process();
+            }
+
+            try
+            {
+                if (job.IsThreadsafe)
+                {
+                    await Task.Run(executeJob);
+                }
+                else
+                {
+                    executeJob();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to finish the job because of exception: {ex}");
+            }
+            finally
+            {
+                job.Dispose();
+            }
+
+            return "OK";
+        }
+
+        static IEnumerable<string> RunProvidersAsync(IEnumerable<IJobPipeline> jobProviders)
+        {
+            foreach (var provider in jobProviders)
+            {
+                foreach (var job in provider.Jobs)
+                {
+                    yield return ExecuteJobAsync(job).Result;
+                }
+            }
+        }
 
         static void Main(string[] args)
         {
-            IBranchDataSource source = new GitlabBranchSource();
+            using var container = BuildAutofacContainer();
 
-            var branches = source.GetBranches("Locko");
-            var numbers = branches.Select(branch => GetNumber(branch.Name));
+            var jobProviders = container.Resolve<IEnumerable<IJobPipeline>>();
+            var jobs = jobProviders.SelectMany(x => x.Jobs);
 
-            var branchDate = DateTime.Now.AddHours(1.0);
-            var targetBranchName = $"{string.Join("_", numbers)}_{branchDate.ToString("ddMMyy_HH")}";
-
-            var repo = new Repository(@"C:\Git\Locko");
-            var branchNames = branches.Select(x => $"origin/{x.Name}").ToHashSet();
-
-            var remote = repo.Network.Remotes["origin"];
-            var refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-
-            //repo.Network.Fetch(remote.Url, refSpecs);
-
-            //Commands.Fetch(repo, remote.Name, refSpecs, null, "fetch for PAROVOZ");
-
-            var developTip = repo.Branches
-                .Where(x => x.IsRemote && x.FriendlyName == "origin/develop")
-                .First().Tip;
-
-            var remoteBranches = repo.Branches.Where(x => branchNames.Contains(x.FriendlyName));
-            var tempBranch = repo.Branches.Where(x => x.FriendlyName == targetBranchName).FirstOrDefault() ?? repo.CreateBranch(targetBranchName, developTip);
-
-            Commands.Checkout(repo, tempBranch);
-
-            var mergeSignature = new Signature("karpov", "karpov@elewise.com", DateTimeOffset.Now);
-
-            foreach (var sourceBranch in remoteBranches)
-            {
-                var result = repo.Merge(sourceBranch, mergeSignature);
-
-                if (result.Status == MergeStatus.Conflicts)
-                {
-                    Console.WriteLine($"АТАТА КОНФЛИКТЭ АЖ {repo.Index.Conflicts.Count()} штукас");
-                }
-            }
-
+            var results = RunProvidersAsync(jobProviders).ToList();
+  
+            Console.WriteLine("All jobs are finished!");
             Console.ReadKey();
-
         }
     }
 }
