@@ -44,7 +44,10 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
 
                     if (result.Status == MergeStatus.Conflicts)
                     {
-                        Console.WriteLine($"Unable to merge {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName}. \r\n INFO: {repo.Index.Conflicts.Count()} conflict(s) found. Resolve all the conflicts and press any key to continue...");
+                        Console.WriteLine();
+                        Console.WriteLine($"Unable to merge {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName} automatically");
+                        Console.WriteLine($"INFO: {repo.Index.Conflicts.Count()} conflict(s) found. Resolve all the conflicts and press any key to continue...");
+
                         Console.ReadKey();
                     }
                 }

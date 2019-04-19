@@ -20,9 +20,11 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
         public MergePipeline(
             IFetchJob fetchJob,
             PrepareBranchJob prepareBranchJob,
-            IMergeJob mergeJob)
+            IMergeJob mergeJob,
+            BuildJob buildJob,
+            PushJob pushJob)
         {
-            Jobs = new IJob[] { fetchJob, prepareBranchJob, mergeJob };
+            Jobs = new IJob[] { prepareBranchJob, fetchJob, mergeJob, buildJob, pushJob };
         }
     }
 }

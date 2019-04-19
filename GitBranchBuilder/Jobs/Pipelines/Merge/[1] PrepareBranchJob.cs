@@ -9,6 +9,9 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
 {
     public class PrepareBranchJob : Job
     {
+        public override string Description
+            => $"Collecting branch data for {ProjectName}";
+
         public Configuration Configuration { get; }
 
         public string ProjectName { get; protected set; }
