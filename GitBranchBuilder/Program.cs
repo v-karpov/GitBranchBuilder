@@ -30,8 +30,9 @@ namespace GitBranchBuilder
         {
             void executeJob()
             {
+                Console.WriteLine();
                 job.Prepare();
-                Console.WriteLine($"Getting job done. {job.Description}");
+                Console.WriteLine($"{job.Description}");
                 job.Process();
             }
 
