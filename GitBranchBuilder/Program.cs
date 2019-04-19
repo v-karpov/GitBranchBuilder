@@ -1,13 +1,12 @@
-﻿using Autofac;
-using GitBranchBuilder.Jobs;
-using LibGit2Sharp;
-using LibGit2Sharp.Handlers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
+
+using Autofac;
+
+using GitBranchBuilder.Jobs;
 
 namespace GitBranchBuilder
 {
@@ -26,58 +25,32 @@ namespace GitBranchBuilder
             return builder.Build();
         }
 
-        static async Task<string> ExecuteJobAsync(IJob job)
-        {
-            void executeJob()
-            {
-                Console.WriteLine();
-                job.Prepare();
-                Console.WriteLine($"{job.Description}");
-                job.Process();
-            }
-
-            try
-            {
-                if (job.IsThreadsafe)
-                {
-                    await Task.Run(executeJob);
-                }
-                else
-                {
-                    executeJob();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Unable to finish the job because of exception: {ex}");
-            }
-            finally
-            {
-                job.Dispose();
-            }
-
-            return "OK";
-        }
-
-        static IEnumerable<string> RunProvidersAsync(IEnumerable<IJobPipeline> jobProviders)
+        static async Task RunProvidersAsync(IEnumerable<IJobPipeline> jobProviders)
         {
             foreach (var provider in jobProviders)
             {
-                foreach (var job in provider.Jobs)
+                try
                 {
-                    yield return ExecuteJobAsync(job).Result;
+                    await provider.ExecuteAction();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Unable to finish the job because of exception: {ex}");
+                }
+                finally
+                {
+                    provider.Dispose();
                 }
             }
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             using var container = BuildAutofacContainer();
 
             var jobProviders = container.Resolve<IEnumerable<IJobPipeline>>();
-            var jobs = jobProviders.SelectMany(x => x.Jobs);
 
-            var results = RunProvidersAsync(jobProviders).ToList();
+            await RunProvidersAsync(jobProviders);
   
             Console.WriteLine("All jobs are finished!");
             Console.ReadKey();

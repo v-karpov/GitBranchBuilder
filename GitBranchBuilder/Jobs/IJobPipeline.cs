@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GitBranchBuilder.Jobs
 {
@@ -14,8 +15,8 @@ namespace GitBranchBuilder.Jobs
         bool ForceParallel { get; }
 
         /// <summary>
-        /// Задачи, выполняемые на данном конвейере
+        /// Дейсвтие, выполняемое данным конвейером
         /// </summary>
-        IEnumerable<IJob> Jobs { get; }
+        Func<Task> ExecuteAction { get; }
     }
 }
