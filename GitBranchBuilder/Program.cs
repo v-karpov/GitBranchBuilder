@@ -31,7 +31,12 @@ namespace GitBranchBuilder
             {
                 try
                 {
+                    var startTime = DateTime.Now;
+
                     await provider.ExecuteAction();
+
+                    Console.WriteLine();
+                    Console.WriteLine($"Work done in {(DateTime.Now - startTime)}");
                 }
                 catch (Exception ex)
                 {

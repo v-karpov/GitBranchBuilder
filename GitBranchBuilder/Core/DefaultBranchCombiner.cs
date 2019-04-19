@@ -18,7 +18,7 @@ namespace GitBranchBuilder.Core
         {
             var branchDate = DateTime.Now
                 .AddHours(1.0)
-                .ToString("ddMMyy_HH");
+                .ToString("ddMMyy_HHmm");
 
             var combinedIds = string.Join("_", sourceBranches.Select(x => x.Id));
             var targetBranchName = $"{combinedIds}_{branchDate}";
