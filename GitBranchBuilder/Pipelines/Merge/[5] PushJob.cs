@@ -1,11 +1,12 @@
 ﻿using System;
-
+using GitBranchBuilder.Jobs;
+using GitBranchBuilder.Pipelines.Merge.Data;
 using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 
-namespace GitBranchBuilder.Jobs.Pipelines.Merge
+namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class PushJob : Job
+    public class PushJob : FinishJob<BuildJobResult>, IMergeFinishJob
     {
         public override string Description 
             => $"Pushing result into {Remote.Name}/{Repository.Head.FriendlyName}";
@@ -26,7 +27,7 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
             Remote = remoteProvider.Remote;
             CredentialsProvider = credentialsProvider.GetCredentials;
 
-            Process = () =>
+            ProcessQuietly = () =>
             {
                 var head = Repository.Head;
 

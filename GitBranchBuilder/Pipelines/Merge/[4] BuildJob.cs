@@ -1,14 +1,17 @@
 ﻿using System;
 using System.IO;
-using GitBranchBuilder.Jobs.Pipelines.Merge.Data;
+
+using GitBranchBuilder.Jobs;
+using GitBranchBuilder.Pipelines.Merge.Data;
+
 using Microsoft.Build.Definition;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 
-namespace GitBranchBuilder.Jobs.Pipelines.Merge
+namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class BuildJob : Job
+    public class BuildJob : PropagationJob<string, BuildJobResult>
     {
         public override string Description => $"Building contents of the branch";
 
@@ -23,7 +26,7 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
         public BuildJob(
             IRepositoryProvider repositoryProvider,
             IConfigurationProvider configurationProvider,
-            BuildJobResult jobResult)
+            PushJob push)
         {
             var repo = repositoryProvider.Repository;
             var buildConfig = configurationProvider.Configuration["Build"];
@@ -34,7 +37,7 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
                     ? verbosity
                     : LoggerVerbosity.Minimal;
 
-            Prepare = () =>
+            Prepare = input =>
             {
                 Logger = new ConsoleLogger(Verbosity);
 
@@ -48,6 +51,8 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
 
             Process = () =>
             {
+                var result = new BuildJobResult() { IsSuccessful = true };
+
                 while (!Project.Build(Logger))
                 {
                     Console.WriteLine();
@@ -55,13 +60,15 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
 
                     if (Console.ReadKey().Key == ConsoleKey.Escape)
                     {
-                        jobResult.IsSuccessful = false;
-                        return;
+                        result.IsSuccessful = false;
+                        break;
                     }
                 }
 
-                jobResult.IsSuccessful = true;
+                return result;
             };
+
+            LinkTo(push);
         }
     }
 }

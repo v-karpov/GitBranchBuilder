@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GitBranchBuilder.Repo;
+
+using GitBranchBuilder.Jobs;
+
 using LibGit2Sharp;
 
-namespace GitBranchBuilder.Jobs.Pipelines.Merge
+namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class MergeJob : Job, IMergeJob
+    public class MergeJob : PropagationJob<MergeBranchData, string>
     {
         public override string Description => $"Merging actual branches into {TargetBranch.FriendlyName}";
 
@@ -20,16 +20,14 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
             IRepositoryProvider repositoryProvider,
             IRemoteBranchProvider remoteBranches,
             ILocalBranchProvider localBranches,
-            IMergeBranchData branchData)
+            BuildJob build)
         {
             var repo = repositoryProvider.Repository;
 
-            Prepare = () =>
+            Prepare = input =>
             {
-                BranchesToMerge = branchData.BranchesToMerge
-                    .Select(remoteBranches.GetBranch);
-
-                TargetBranch = localBranches.GetBranch(branchData.TargetBranch);
+                BranchesToMerge = input.BranchesToMerge.Select(remoteBranches.GetBranch);
+                TargetBranch = localBranches.GetBranch(input.TargetBranch);
 
                 Commands.Checkout(repo, TargetBranch);
             };
@@ -51,7 +49,11 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
                         Console.ReadKey();
                     }
                 }
+
+                return "OK";
             };
+
+            LinkTo(build);
         }
     }
 }

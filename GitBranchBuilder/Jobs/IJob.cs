@@ -1,12 +1,19 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace GitBranchBuilder.Jobs
 {
-    public interface IJob : IDisposable
+    /// <summary>
+    /// Интерфейс, описывающий блок работы
+    /// </summary>
+    /// <typeparam name="TIn">Тип входных данных блока работы</typeparam>
+    public interface IJob<in TIn> : 
+        ITargetBlock<TIn>,
+        IDisposable
     {
+        /// <summary>
+        /// Описание работы, понятное для пользователя
+        /// </summary>
         string Description { get; }
-
-        Task Task { get; }
     }
 }

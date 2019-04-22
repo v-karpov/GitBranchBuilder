@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace GitBranchBuilder.Jobs.Pipelines.Merge
+namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class MergeBranchData : IMergeBranchData
+    public class MergeBranchData
     {
         public IEnumerable<BranchInfo> BranchesToMerge { get; internal set; }
 

@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using GitBranchBuilder.Jobs;
 using LibGit2Sharp;
 
-namespace GitBranchBuilder.Jobs.Pipelines.Merge
+namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class FetchJob : Job, IFetchJob
+    public class FetchJob : StartJob<string>, IMergeStartJob
     {
         public override string Description => $"Fetching from {Remote.Name}...";
 
-        public Repository Repository { get; protected set; }
+        public Repository Repository { get; set; }
 
-        public Remote Remote { get; protected set; }
+        public Remote Remote { get; set; }
 
         public IEnumerable<string> RefSpecs { get; protected set; }
 
@@ -20,13 +20,13 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
             : base()
         {
             Repository = repositoryProvider.Repository;
+            Remote = remoteProvider.Remote;
 
-            Prepare = () =>
+            Prepare = options =>
             {
-                Remote = remoteProvider.Remote;
                 RefSpecs = Remote.FetchRefSpecs.Select(x => x.Specification);
             };
-         
+
             Process = () =>
             {
                 Commands.Fetch(Repository, Remote.Name, RefSpecs,
@@ -35,6 +35,8 @@ namespace GitBranchBuilder.Jobs.Pipelines.Merge
                         CredentialsProvider = credentialsProvider.GetCredentials,
                         OnProgress = str => { Console.WriteLine(str); return true; }
                     }, string.Empty);
+
+                return "OK";
             };
         }
     }

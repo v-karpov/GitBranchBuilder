@@ -72,6 +72,9 @@
       <HintPath>..\packages\Microsoft.VisualStudio.Setup.Configuration.Interop.1.16.30\lib\net35\Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="MoreLinq, Version=3.1.1.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\packages\morelinq.3.1.1\lib\net451\MoreLinq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -145,6 +148,9 @@
     <Reference Include="System.Threading.Tasks.Dataflow, Version=4.6.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Dataflow.4.9.0\lib\netstandard2.0\System.Threading.Tasks.Dataflow.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
@@ -160,21 +166,28 @@
     <Compile Include="CompositeCredentials.cs" />
     <Compile Include="Core\GitlabClientProvider.cs" />
     <Compile Include="IGitlabClientProvider.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\Data\BuildJobResult.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\[5] PushJob.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\[4] BuildJob.cs" />
+    <Compile Include="Jobs\Impl\CombinedStartJob.cs" />
+    <Compile Include="Jobs\Impl\FinishJob.cs" />
+    <Compile Include="Jobs\Impl\JobExtensions.cs" />
+    <Compile Include="Jobs\Impl\PropagationJob.cs" />
+    <Compile Include="Jobs\Impl\StartJob.cs" />
+    <Compile Include="Jobs\JobLink.cs" />
+    <Compile Include="Pipelines\PipelineResult.cs" />
+    <Compile Include="Pipelines\PipelineOptions.cs" />
+    <Compile Include="Pipelines\Merge\Data\BuildJobResult.cs" />
+    <Compile Include="Pipelines\Merge\[5] PushJob.cs" />
+    <Compile Include="Pipelines\Merge\[4] BuildJob.cs" />
     <Compile Include="RepositoryHolder.cs" />
     <Compile Include="Core\DefaultBranchCombiner.cs" />
     <Compile Include="Core\OriginRemoteProvier.cs" />
     <Compile Include="IBranchProvider.cs" />
     <Compile Include="IRemoteProvider.cs" />
     <Compile Include="IBranchInfoProvider.cs" />
-    <Compile Include="Jobs\Job.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\Data\IMergeBranchData.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\Data\MergeBranchData.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\[3] MergeJob.cs" />
+    <Compile Include="Jobs\Impl\Job.cs" />
+    <Compile Include="Pipelines\Merge\Data\MergeBranchData.cs" />
+    <Compile Include="Pipelines\Merge\[3] MergeJob.cs" />
     <Compile Include="Jobs\IJob.cs" />
-    <Compile Include="Jobs\IJobPipeline.cs" />
+    <Compile Include="Pipelines\IPipeline.cs" />
     <Compile Include="Core\ConfigurationCredentialsProvider.cs" />
     <Compile Include="Core\DefaultConfigurationProvider.cs" />
     <Compile Include="Core\GitlabBranchSource.cs" />
@@ -183,11 +196,9 @@
     <Compile Include="ICredentialsProvider.cs" />
     <Compile Include="Core\ProjectBranchInfoProvider.cs" />
     <Compile Include="IConfigurationProvider.cs" />
-    <Compile Include="Jobs\IMergeJob.cs" />
-    <Compile Include="Jobs\IFetchJob.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\[2] FetchJob.cs" />
-    <Compile Include="Jobs\Pipelines\MergePipeline.cs" />
-    <Compile Include="Jobs\Pipelines\Merge\[1] PrepareBranchJob.cs" />
+    <Compile Include="Pipelines\Merge\[2] FetchJob.cs" />
+    <Compile Include="Pipelines\Merge\MergePipeline.cs" />
+    <Compile Include="Pipelines\Merge\[1] PrepareBranchJob.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repo\DefaultRepositoryProvider.cs" />
