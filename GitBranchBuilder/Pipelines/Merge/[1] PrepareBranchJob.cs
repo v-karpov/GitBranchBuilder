@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks.Dataflow;
-using GitBranchBuilder.Jobs;
+﻿using GitBranchBuilder.Jobs;
+
 using SharpConfig;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class PrepareBranchJob : StartJob<MergeBranchData>, IMergeStartJob
+    public class PrepareBranchJob : StartJob<MergeBranchData>, IMergeJob
     {
         public override string Description
             => $"Collecting branch data for {ProjectName}";
@@ -16,8 +16,7 @@ namespace GitBranchBuilder.Pipelines.Merge
         public PrepareBranchJob(
             IBranchSource branchSource,
             IBranchCombiner branchCombiner,
-            IConfigurationProvider configurationProvider,
-            FetchJob fetch, MergeJob merge)
+            IConfigurationProvider configurationProvider)
         {
             Configuration = configurationProvider.Configuration;
 
@@ -36,16 +35,6 @@ namespace GitBranchBuilder.Pipelines.Merge
                     TargetBranch = branchCombiner.Combine(branchesToMerge),
                 };
             };
-
-            // соединение блоков
-            var joint = new JoinBlock<MergeBranchData, string>();
-            var transfomer = new TransformBlock<System.Tuple<MergeBranchData, string>, MergeBranchData>(x => x.Item1);
-
-            this.LinkTo(joint.Target1);
-            fetch.LinkTo(joint.Target2);
-
-            joint.LinkTo(transfomer);
-            transfomer.LinkTo(merge);
         }
     }
 }

@@ -1,34 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using LibGit2Sharp;
 
 namespace GitBranchBuilder.Repo
 {
-    public class LocalBranchProvider : ILocalBranchProvider
+    public class LocalBranchProvider : RepositoryHolder, ILocalBranchProvider
     {
-        public Repository Repository { get; }
-        
-        public Branch DefaultBranch { get; }
+        public Dictionary<string, Branch> Branches => BranchesLoader.Value;
 
-        public Dictionary<string, Branch> Branches { get; }
+        public Lazy<Dictionary<string, Branch>> BranchesLoader { get; }
+
+        public Func<string, Branch> CreateBranch { get; }
 
         public Branch GetBranch(BranchInfo branch)
             => Branches.TryGetValue(branch.Name, out var result) 
                 ? result
-                : Repository.CreateBranch(branch.Name, DefaultBranch.Tip);
+                : CreateBranch(branch.Name);
 
         public LocalBranchProvider(
             IRepositoryProvider repositoryProvider,
-            IDefaultBranch defaultBranch)
+            IDefaultBranch defaultBranch) : base (repositoryProvider)
         {
-            Repository = repositoryProvider.Repository;
-            
-            Branches = Repository.Branches
+            BranchesLoader = new Lazy<Dictionary<string, Branch>>(() => Repository.Branches
                 .Where(x => !x.IsRemote)
-                .ToDictionary(x => x.FriendlyName);
+                .ToDictionary(x => x.FriendlyName));
 
-            DefaultBranch = defaultBranch.Branch;
+            CreateBranch = branchName =>
+                Repository.CreateBranch(branchName, defaultBranch.Branch.Tip);
         }
     }
 }

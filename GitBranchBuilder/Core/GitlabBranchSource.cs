@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using NGitLab;
@@ -12,7 +13,9 @@ namespace GitBranchBuilder
 
         public IBranchInfoProvider BranchInfoProvider { get; }
 
-        public GitLabClient Client { get; }
+        public GitLabClient Client => ClientLoader.Value;
+
+        protected Lazy<GitLabClient> ClientLoader { get; }
 
         public IEnumerable<BranchInfo> GetBranches(string projectName)
         {
@@ -31,7 +34,9 @@ namespace GitBranchBuilder
                 .Where(x => x.Labels.Any(PickedLabels.Contains));
 
             var pickedBranches = pickedMergeRequests
-                .Select(x => BranchInfoProvider.GetBranchInfo(x.SourceBranch))
+                .Select(x => BranchInfoProvider
+                    .GetBranchInfo(x.SourceBranch)
+                    .SetTag(x.Labels))
                 .OrderBy(x => x.Id);
 
             return pickedBranches;
@@ -42,7 +47,7 @@ namespace GitBranchBuilder
             IBranchInfoProvider branchInfoProvider,
             IConfigurationProvider configurationProvider)
         {
-            Client = gitlabClientProvider.Client;
+            ClientLoader = gitlabClientProvider.Client;
             BranchInfoProvider = branchInfoProvider;
 
             PickedLabels = configurationProvider

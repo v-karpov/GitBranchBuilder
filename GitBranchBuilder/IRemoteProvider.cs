@@ -9,6 +9,6 @@ namespace GitBranchBuilder
 {
     public interface IRemoteProvider
     {
-        Remote Remote { get; }
+        Lazy<Remote> Remote { get; }
     }
 }

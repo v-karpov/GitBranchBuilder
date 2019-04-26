@@ -1,28 +1,31 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using LibGit2Sharp;
 
 namespace GitBranchBuilder.Repo
 {
-    public class RemoteBranchProvider : IRemoteBranchProvider
+    public class RemoteBranchProvider : RepositoryHolder, IRemoteBranchProvider
     {
-        public Remote Remote { get; }
+        public Remote Remote => RemoteLoader.Value;
 
-        public Repository Repository { get; }
-        
-        public ILookup<string, Branch> Branches { get; }
+        public Lazy<Remote> RemoteLoader { get; }
+
+        public ILookup<string, Branch> Branches => BranchesLoader.Value;
+
+        public Lazy<ILookup<string, Branch>> BranchesLoader { get; private set; }
 
         public Branch GetBranch(BranchInfo branch)
             => Branches[branch.Name].FirstOrDefault();
 
         public RemoteBranchProvider(IRepositoryProvider repositoryProvider, IRemoteProvider remoteProvider)
+            : base(repositoryProvider)
         {
-            Remote = remoteProvider.Remote;
-            Repository = repositoryProvider.Repository;
+            RemoteLoader = remoteProvider.Remote;
 
-            Branches = Repository.Branches
+            BranchesLoader = new Lazy<ILookup<string, Branch>>(() => Repository.Branches
                 .Where(x => x.IsRemote)
-                .ToLookup(x => x.FriendlyName.Replace(Remote.Name + "/", ""));
+                .ToLookup(x => x.FriendlyName.Replace(Remote.Name + "/", "")));
         }
     }
 }

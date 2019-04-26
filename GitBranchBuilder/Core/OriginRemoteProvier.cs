@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using System;
+using LibGit2Sharp;
 
 namespace GitBranchBuilder.Core
 {
@@ -6,9 +7,9 @@ namespace GitBranchBuilder.Core
     {
         public const string RemoteName = "origin";
 
-        public Remote Remote { get; }
+        public Lazy<Remote> Remote { get; }
 
         public OriginRemoteProvdier(IRepositoryProvider repositoryProvider) : base(repositoryProvider)
-            => Remote = Repository.Network.Remotes[RemoteName];
+            => Remote = new Lazy<Remote>(() => Repository.Network.Remotes[RemoteName]);
     }
 }

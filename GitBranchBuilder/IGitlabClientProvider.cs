@@ -1,9 +1,10 @@
-﻿using NGitLab;
+﻿using System;
+using NGitLab;
 
 namespace GitBranchBuilder
 {
     public interface IGitlabClientProvider
     {
-        GitLabClient Client { get; }
+        Lazy<GitLabClient> Client { get; }
     }
 }

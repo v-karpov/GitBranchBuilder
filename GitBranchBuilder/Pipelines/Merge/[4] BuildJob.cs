@@ -11,11 +11,11 @@ using Microsoft.Build.Logging;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class BuildJob : PropagationJob<string, BuildJobResult>
+    public class BuildJob : PropagationJob<string, BuildJobResult>, IMergeJob
     {
         public override string Description => $"Building contents of the branch";
 
-        public string BuildPath { get; protected set; }
+        public string BuildPath { get; }
 
         public Project Project { get; protected set; }
 
@@ -25,8 +25,7 @@ namespace GitBranchBuilder.Pipelines.Merge
 
         public BuildJob(
             IRepositoryProvider repositoryProvider,
-            IConfigurationProvider configurationProvider,
-            PushJob push)
+            IConfigurationProvider configurationProvider)
         {
             var repo = repositoryProvider.Repository;
             var buildConfig = configurationProvider.Configuration["Build"];
@@ -67,8 +66,6 @@ namespace GitBranchBuilder.Pipelines.Merge
 
                 return result;
             };
-
-            LinkTo(push);
         }
     }
 }

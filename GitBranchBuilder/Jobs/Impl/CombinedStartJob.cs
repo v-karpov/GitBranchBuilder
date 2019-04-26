@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+
 using GitBranchBuilder.Pipelines;
+
 using MoreLinq;
 
 namespace GitBranchBuilder.Jobs
@@ -11,12 +11,12 @@ namespace GitBranchBuilder.Jobs
     /// <summary>
     /// Объект совмещенного старта нескольких работ
     /// </summary>
-    public class CombinedStartJob : IJob<PipelineOptions>, IStartJob
+    public class CombinedStartJob : StartJob<PipelineOptions>
     {
         /// <summary>
         /// Описание работы
         /// </summary>
-        public string Description 
+        public override string Description 
             => $"Combination of jobs: \r\n{CombinedDescription}";
 
         /// <summary>
@@ -38,28 +38,22 @@ namespace GitBranchBuilder.Jobs
         /// <summary>
         /// Блок, рассылающий данные дочерним работам
         /// </summary>
-        protected ITargetBlock<PipelineOptions> Broadcast { get; }
+        protected BroadcastBlock<PipelineOptions> Broadcast { get; }
+
+        /// <summary>
+        /// Блок, обрабатывающий данные и передающий результат
+        /// </summary>
+        protected override ISourceBlock<PipelineOptions> SourceBlock => Broadcast;
+
+        /// <summary>
+        /// Блок, получающий данные на вход и обрабатывающий их
+        /// </summary>
+        protected override ITargetBlock<PipelineOptions> TargetBlock => Broadcast;
 
         /// <summary>
         /// Освобождает все ресурсы, которыми владеет данный объект
         /// </summary>
-        public virtual void Dispose() => Links.ForEach(x => x.Dispose());
-
-        #region [ITargetBlock<PipelineStartOptions>]
-
-        Task IDataflowBlock.Completion => Broadcast.Completion;
-        
-        DataflowMessageStatus ITargetBlock<PipelineOptions>.OfferMessage(DataflowMessageHeader messageHeader,
-                                                                              PipelineOptions messageValue,
-                                                                              ISourceBlock<PipelineOptions> source,
-                                                                              bool consumeToAccept)
-            => Broadcast.OfferMessage(messageHeader, messageValue, source, consumeToAccept);
-
-        void IDataflowBlock.Complete() => Broadcast.Complete();
-
-        void IDataflowBlock.Fault(Exception exception) => Broadcast.Fault(exception);
-
-        #endregion
+        public override void Dispose() => Links.ForEach(x => x.Dispose());
 
         /// <summary>
         /// Конструктор по умолчанию
@@ -69,7 +63,7 @@ namespace GitBranchBuilder.Jobs
         {
             var broadcast = new BroadcastBlock<PipelineOptions>(x => x);
 
-            Links = pipelineStarts.Select(broadcast.LinkTo).ToList();
+            Links = pipelineStarts.Select(broadcast.LinkSingle).ToList();
             Broadcast = broadcast;
         }
     }

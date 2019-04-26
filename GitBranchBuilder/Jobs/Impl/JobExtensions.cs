@@ -14,7 +14,7 @@ namespace GitBranchBuilder.Jobs
         /// <param name="source">Источник данных</param>
         /// <param name="target">Целевая работа</param>
         /// <returns></returns>
-        public static JobLink<TInput> LinkTo<TInput>(this ISourceBlock<TInput> source, IJob<TInput> target) 
-            => new JobLink<TInput>(source, target);
+        public static JobLink<TInput> LinkSingle<TInput>(this ISourceBlock<TInput> source, IJob<TInput> target) 
+            => new JobLink<TInput>(source, target, JobLink<TInput>.SingleMessageOptions);
     }
 }

@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
-using Autofac;
-
 namespace GitBranchBuilder.Pipelines
 {
     /// <summary>
@@ -17,19 +15,18 @@ namespace GitBranchBuilder.Pipelines
         Task<PipelineResult> Run(PipelineOptions options);
 
         /// <summary>
-        /// Метод, выполняющий подготовку с использованием контейнера зависимостей <see cref="Autofac.IContainer"/>
-        /// </summary>
-        /// <param name="container"></param>
-        void Prepare(IContainer container);
-
-        /// <summary>
-        /// Параметры обрабатывающих блоков
+        /// Глобальные параметры обрабатывающих блоков
         /// </summary>
         ExecutionDataflowBlockOptions ExecutionOptions { get; }
 
         /// <summary>
-        /// Параметры группирующих блоков
+        /// Глобальные параметры группирующих блоков
         /// </summary>
         GroupingDataflowBlockOptions GroupingOptions { get; }
+
+        /// <summary>
+        /// Глобальные параметры связи блоков в конвейере
+        /// </summary>
+        DataflowLinkOptions LinkOptions { get; }
     }
 }

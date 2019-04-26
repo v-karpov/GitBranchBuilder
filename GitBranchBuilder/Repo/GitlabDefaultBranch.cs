@@ -9,7 +9,9 @@ namespace GitBranchBuilder.Repo
 {
     public class GitlabDefaultBranch : IDefaultBranch
     {
-        public Branch Branch { get; }
+        public Branch Branch => BranchLoader.Value;
+
+        protected Lazy<Branch> BranchLoader { get; }
 
         public GitlabDefaultBranch(
             IGitlabClientProvider gitlabClientProvider,
@@ -20,16 +22,19 @@ namespace GitBranchBuilder.Repo
             var config = configurationProvider.Configuration["GitLab"];
             var projectName = config["Project"].StringValue;
 
-            var client = gitlabClientProvider.Client;
-            var project = client.Projects
-                .Accessible()
-                .FirstOrDefault(x => x.Name == projectName);
+            BranchLoader = new Lazy<Branch>(() =>
+            {
+                var client = gitlabClientProvider.Client.Value;
+                var project = client.Projects
+                    .Accessible()
+                    .FirstOrDefault(x => x.Name == projectName);
 
-            var defaultBranch = project == null
-                ? BranchInfo.Develop
-                : branchInfoProvider.GetBranchInfo(project.DefaultBranch);
-            
-            Branch = remoteBranchProvider.GetBranch(defaultBranch);
+                var defaultBranch = project == null
+                    ? BranchInfo.Develop
+                    : branchInfoProvider.GetBranchInfo(project.DefaultBranch);
+
+                return remoteBranchProvider.GetBranch(defaultBranch);
+            });
         }
     }
 }

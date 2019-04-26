@@ -4,20 +4,16 @@ using LibGit2Sharp;
 
 namespace GitBranchBuilder.Repo
 {
-    public class OriginRemoteProvdier : IRemoteProvider
+    public class OriginRemoteProvdier : RepositoryHolder, IRemoteProvider
     {
         public const string RemoteName = "origin";
 
-        public Remote Remote => RemoteLoader.Value;
+        public Lazy<Remote> Remote { get; }
 
-        protected Lazy<Remote> RemoteLoader { get; }
-
-        protected Repository Repository { get; }
-
-        public OriginRemoteProvdier(IRepositoryProvider repositoryProvider)
+        public OriginRemoteProvdier(IRepositoryProvider repositoryProvider) 
+            : base(repositoryProvider)
         {
-            Repository = repositoryProvider.Repository;
-            RemoteLoader = new Lazy<Remote>(() => Repository.Network.Remotes[RemoteName]);
+            Remote = new Lazy<Remote>(() => Repository.Network.Remotes[RemoteName]);
         }
     }
 }

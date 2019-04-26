@@ -9,12 +9,18 @@ namespace GitBranchBuilder.Jobs
     /// </summary>
     /// <typeparam name="TInput">Входной тип данных</typeparam>
     /// <typeparam name="TOutput">Тип результата</typeparam>
-    public abstract class Job<TInput, TOutput> : IJob<TInput>, ISourceBlock<TOutput>
+    public abstract class Job<TInput, TOutput> : IJob<TInput, TOutput>
     {
         /// <summary>
         /// Описание работы, понятное для пользователя
         /// </summary>
         public virtual string Description => $"{GetType().Name}";
+
+        /// <summary>
+        /// Показывает, следует ли автоматически завершать работу.
+        /// Аналогично установке связи <see cref="JobLink{T}.SingleMessageOptions"/>
+        /// </summary>
+        protected virtual bool Autocomplete { get; } = true;
 
         /// <summary>
         /// Делегат для выполнения обработки задания
@@ -34,10 +40,16 @@ namespace GitBranchBuilder.Jobs
         protected virtual TOutput Execute(TInput input)
         {
             Prepare?.Invoke(input);
-
             Console.WriteLine($"{Description}");
 
-            return Process.Invoke();
+            var result = Process.Invoke();
+
+            if (Autocomplete)
+            {
+                Complete();
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -72,6 +84,8 @@ namespace GitBranchBuilder.Jobs
         /// </summary>
         public virtual Task Completion => TargetBlock.Completion;
 
+        protected void Complete() => (this as IDataflowBlock).Complete();
+
         DataflowMessageStatus ITargetBlock<TInput>.OfferMessage(DataflowMessageHeader messageHeader, TInput messageValue, ISourceBlock<TInput> source, bool consumeToAccept)
             => TargetBlock.OfferMessage(messageHeader, messageValue, source, consumeToAccept);
 
@@ -90,8 +104,20 @@ namespace GitBranchBuilder.Jobs
         /// </summary>
         protected abstract ISourceBlock<TOutput> SourceBlock { get; }
 
-        IDisposable ISourceBlock<TOutput>.LinkTo(ITargetBlock<TOutput> target, DataflowLinkOptions linkOptions)
-            => SourceBlock.LinkTo(target, linkOptions);
+        /// <summary>
+        /// Изменяет состояние опций связи работ
+        /// </summary>
+        /// <param name="linkOptions">Опции связи работ</param>
+        /// <returns>Уcтанавливает <see cref="DataflowLinkOptions.PropagateCompletion"/> в значение true</returns>
+        protected virtual DataflowLinkOptions ModifyLinkOptions(DataflowLinkOptions linkOptions)
+        {
+            linkOptions.PropagateCompletion = true;
+
+            return linkOptions;
+        }
+
+        public IDisposable LinkTo(ITargetBlock<TOutput> target, DataflowLinkOptions linkOptions)
+            => SourceBlock.LinkTo(target, ModifyLinkOptions(linkOptions));
 
         TOutput ISourceBlock<TOutput>.ConsumeMessage(DataflowMessageHeader messageHeader, ITargetBlock<TOutput> target, out bool messageConsumed)
             => SourceBlock.ConsumeMessage(messageHeader, target, out messageConsumed);

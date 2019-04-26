@@ -6,28 +6,27 @@ using LibGit2Sharp.Handlers;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class PushJob : FinishJob<BuildJobResult>, IMergeFinishJob
+    public class PushJob : FinalJob<BuildJobResult>, IMergeJob
     {
         public override string Description 
             => $"Pushing result into {Remote.Name}/{Repository.Head.FriendlyName}";
 
         public Repository Repository { get; }
 
-        public Remote Remote { get; }
+        public Remote Remote => RemoteLoader.Value;
 
-        public CredentialsHandler CredentialsProvider { get; }
+        public Lazy<Remote> RemoteLoader { get; }
 
         public PushJob(
             IRepositoryProvider repositoryProvider,
             IRemoteProvider remoteProvider,
             ICredentialsProvider credentialsProvider,
-            IDefaultBranch defaultBranch)
+            IDefaultBranch defaultBranch) : base()
         {
             Repository = repositoryProvider.Repository;
-            Remote = remoteProvider.Remote;
-            CredentialsProvider = credentialsProvider.GetCredentials;
+            RemoteLoader = remoteProvider.Remote;
 
-            ProcessQuietly = () =>
+            Process = () =>
             {
                 var head = Repository.Head;
 
@@ -47,10 +46,12 @@ namespace GitBranchBuilder.Pipelines.Merge
                     branch: Repository.Head,
                     pushOptions: new PushOptions
                     {
-                        CredentialsProvider = CredentialsProvider,
+                        CredentialsProvider = credentialsProvider.GetCredentials,
                         PackbuilderDegreeOfParallelism = Environment.ProcessorCount,
                         OnPushStatusError = err => Console.WriteLine(err)
                     });
+
+                return PipelineResult.Empty;
             };
         }
     }

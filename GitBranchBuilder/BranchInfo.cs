@@ -21,10 +21,16 @@ namespace GitBranchBuilder
 
         public string Id { get; }
 
-        public BranchInfo(string branchName, string id = "")
+        public object Tag { get; protected set; }
+
+        public BranchInfo SetTag(object tag)
+            => new BranchInfo(Name, Id, tag);
+
+        public BranchInfo(string branchName, string id = "", object tag = default)
         {
             Name = branchName;
             Id = id;
+            Tag = tag;
         }
 
         public override int GetHashCode()

@@ -8,7 +8,7 @@ using LibGit2Sharp;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class MergeJob : PropagationJob<MergeBranchData, string>
+    public class MergeJob : PropagationJob<MergeBranchData, string>, IMergeJob
     {
         public override string Description => $"Merging actual branches into {TargetBranch.FriendlyName}";
 
@@ -20,10 +20,11 @@ namespace GitBranchBuilder.Pipelines.Merge
             IRepositoryProvider repositoryProvider,
             IRemoteBranchProvider remoteBranches,
             ILocalBranchProvider localBranches,
-            BuildJob build)
+            IConfigurationProvider configurationProvider)
         {
             var repo = repositoryProvider.Repository;
-
+            var mergeConfig = configurationProvider.Configuration["Merge"];
+            
             Prepare = input =>
             {
                 BranchesToMerge = input.BranchesToMerge.Select(remoteBranches.GetBranch);
@@ -35,25 +36,35 @@ namespace GitBranchBuilder.Pipelines.Merge
             Process = () =>
             {
                 var mergeSignature = new Signature("parovoz", "parovoz@elewise.com", DateTimeOffset.Now);
+                var mergeOptions = new MergeOptions
+                {
+                    MergeFileFavor = Enum.TryParse(mergeConfig["FileFavor"].StringValue, out MergeFileFavor favor) 
+                        ? favor
+                        : MergeFileFavor.Normal,
+                    SkipReuc = true
+                };
 
                 foreach (var sourceBranch in BranchesToMerge)
                 {
-                    var result = repo.Merge(sourceBranch, mergeSignature);
+                    var result = repo.Merge(sourceBranch, mergeSignature, mergeOptions);
+
+                    Console.WriteLine();
 
                     if (result.Status == MergeStatus.Conflicts)
                     {
-                        Console.WriteLine();
                         Console.WriteLine($"Unable to merge {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName} automatically");
                         Console.WriteLine($"INFO: {repo.Index.Conflicts.Count()} conflict(s) found. Resolve all the conflicts and press any key to continue...");
 
                         Console.ReadKey();
                     }
+                    else
+                    {
+                        Console.WriteLine($"Merged successfully {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName}");
+                    }
                 }
 
                 return "OK";
             };
-
-            LinkTo(build);
         }
     }
 }

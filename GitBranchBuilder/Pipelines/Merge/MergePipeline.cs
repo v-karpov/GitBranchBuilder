@@ -1,75 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-
-using Autofac;
-using GitBranchBuilder.Jobs;
+﻿using GitBranchBuilder.Jobs;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public interface IMergeJob { }
-
-    public interface IMergeStartJob : IMergeJob, IStartJob { }
-
-    public interface IMergeFinishJob : IMergeJob, IFinishJob<Data.BuildJobResult> { }
-
-    public interface IMergePipeline : IPipeline { }
+    public interface IMergeJob : IJob { }
 
     /// <summary>
     /// Конвейер, выполняющий слияние веток
     /// </summary>
-    public class MergePipeline : IMergePipeline
+    public class MergePipeline : ConfigurablePipeline<IMergeJob>
     {
         /// <summary>
-        /// Стартовое задание
+        /// Конфигуратор для конвейера <see cref="MergePipeline"/>
         /// </summary>
-        public CombinedStartJob Start { get; set; }
-
-        public Task Completion { get; set; }
-
-        protected Func<PipelineResult> FindResult { get; set; }
-
-        /// <summary>
-        /// Опции выполнения заданий обработки
-        /// </summary>
-        public ExecutionDataflowBlockOptions ExecutionOptions { get; private set; }
-
-        /// <summary>
-        /// Опции группировки в заданиях
-        /// </summary>
-        public GroupingDataflowBlockOptions GroupingOptions { get; private set; }
-
-        /// <summary>
-        /// Очищает ресурсы данного объекта
-        /// </summary>
-        public void Dispose() { Start.Dispose(); }
-
-        /// <summary>
-        /// Подготоваливает конвейер к запуску
-        /// </summary>
-        /// <param name="container">Контейнер зависимостей Autofac</param>
-        public void Prepare(IContainer container)
+        private class PipelineConfigurator : PipelineConfigurator<IMergeJob>
         {
-            var startJobs = container.Resolve<IEnumerable<IMergeStartJob>>();
-            var finishJobs = container.Resolve<IEnumerable<IMergeFinishJob>>();
+            public PipelineConfigurator(
+                PrepareBranchJob prepareBranch,
+                FetchJob fetch,
+                MergeJob merge,
+                BuildJob build,
+                PushJob push)
+            {
+                Jobs = CreateCollection<IMergeJob>(prepareBranch, fetch, merge, build, push);
+                Start = new CombinedStartJob(CreateCollection<IStartJob>(prepareBranch, fetch));
 
-            Start = new CombinedStartJob(startJobs);
-            Completion = finishJobs.Select(x => x.Completion).First();
-
-            FindResult = () => finishJobs
-                .Where(job => job.Completion.IsCompleted)
-                .First()
-                .Result;
+                ConfigureResult = pipeline =>
+                    Join(prepareBranch, fetch, pipeline, result => result.Item1)
+                        .LinkTo(merge)
+                        .LinkTo(build)
+                        .LinkTo(push)
+                        .Result;
+            }
         }
-
-        public async Task<PipelineResult> Run(PipelineOptions options)
+        
+        public MergePipeline(IPipelineConfigurator<IMergeJob> configurator)
+            : base(configurator)
         {
-            Start.Post(options);
-            await Completion;
 
-            return FindResult?.Invoke() ?? PipelineResult.Empty;
         }
     }
 }

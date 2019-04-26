@@ -9,6 +9,28 @@ namespace GitBranchBuilder.Core
     /// </summary>
     public class DefaultBranchCombiner : IBranchCombiner
     {
+        static Dictionary<string, string> Labels = new Dictionary<string, string>
+        {
+            ["fix"] = "f",
+            ["lb"] = "lb",
+            ["integration"] = "i"
+        };
+
+        private string ProcessLabels(BranchInfo info)
+        {
+            if (info.Tag is string[] labels)
+            {
+                var otherLabels = labels
+                    .Select(x => x.ToLower())
+                    .Where(x => x != "chu-chu")
+                    .Select(x => (Labels.TryGetValue(x, out var value), value ?? x));
+
+                return $"{info.Id}{otherLabels.FirstOrDefault(x => x.Item1).Item2}";
+            }
+
+            return info.Id;
+        }
+
         /// <summary>
         /// Объединяет ветки в одну на основе логики идентификаторов
         /// </summary>
@@ -17,11 +39,10 @@ namespace GitBranchBuilder.Core
         public BranchInfo Combine(IEnumerable<BranchInfo> sourceBranches)
         {
             var branchDate = DateTime.Now
-                .AddHours(1.0)
-                .ToString("ddMMyy_HHmm");
+                .ToString("yyMMdd_HHmm");
 
-            var combinedIds = string.Join("_", sourceBranches.Select(x => x.Id));
-            var targetBranchName = $"{combinedIds}_{branchDate}";
+            var combinedIds = string.Join("_", sourceBranches.Select(ProcessLabels));
+            var targetBranchName = $"{branchDate}_{combinedIds}";
 
             return new BranchInfo(targetBranchName, combinedIds);
         }
