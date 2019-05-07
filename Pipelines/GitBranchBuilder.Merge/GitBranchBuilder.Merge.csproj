@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\GitBranchBuilder.Build\GitBranchBuilder.Build.csproj" />
+    <ProjectReference Include="..\..\Libraries\GitBranchBuilder.GitLab\GitBranchBuilder.GitLab.csproj" />
+  </ItemGroup>
+</Project>

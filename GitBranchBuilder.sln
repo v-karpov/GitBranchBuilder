@@ -3,7 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitBranchBuilder", "GitBranchBuilder\GitBranchBuilder.csproj", "{25ADCD98-E660-42CE-AE4B-2DC5D831B187}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipelines", "Pipelines", "{1C21BA95-6934-428B-960A-34B9F2A0A472}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C3A53411-DFA5-411E-8AC4-743140C7BFF7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharpConfig", "Core\SharpConfig\SharpConfig.csproj", "{0564DB66-EACB-4F3F-8CDE-D212EB7C6764}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitBranchBuilder", "Core\GitBranchBuilder\GitBranchBuilder.csproj", "{A3F8C51E-D6ED-4505-817A-482069326EA8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{67D8FFCB-5860-45FD-88E6-4D6A8B3200E7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitBranchBuilder.Merge", "Pipelines\GitBranchBuilder.Merge\GitBranchBuilder.Merge.csproj", "{77B46157-D33B-4BF2-B7C6-6B22E560DFD9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitBranchBuilder.GitLab", "Libraries\GitBranchBuilder.GitLab\GitBranchBuilder.GitLab.csproj", "{FEBCC5F0-90D4-4549-B7AC-FFB8D2E0A9B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitBranchBuilder.Repository", "Libraries\GitBranchBuilder.Repository\GitBranchBuilder.Repository.csproj", "{5DB56DF5-DAF2-479A-87E2-BFB4E8659AE8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{A02DFDF8-71CA-4C9C-BBF0-B97A736D2887}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitBranchBuilder.Console", "UI\GitBranchBuilder.Console\GitBranchBuilder.Console.csproj", "{A449A2BD-FB70-4288-924D-A06789D9AB91}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitBranchBuilder.Build", "Libraries\GitBranchBuilder.Build\GitBranchBuilder.Build.csproj", "{E465384A-6F4F-4521-81DE-8685B594439D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitBranchBuilder.Build.MSBuild", "Libraries\GitBranchBuilder.Build.MSBuild\GitBranchBuilder.Build.MSBuild.csproj", "{B2655FC0-0589-4E39-A6F7-41E81651D531}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,13 +33,51 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{25ADCD98-E660-42CE-AE4B-2DC5D831B187}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25ADCD98-E660-42CE-AE4B-2DC5D831B187}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25ADCD98-E660-42CE-AE4B-2DC5D831B187}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25ADCD98-E660-42CE-AE4B-2DC5D831B187}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0564DB66-EACB-4F3F-8CDE-D212EB7C6764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0564DB66-EACB-4F3F-8CDE-D212EB7C6764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0564DB66-EACB-4F3F-8CDE-D212EB7C6764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0564DB66-EACB-4F3F-8CDE-D212EB7C6764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3F8C51E-D6ED-4505-817A-482069326EA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3F8C51E-D6ED-4505-817A-482069326EA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3F8C51E-D6ED-4505-817A-482069326EA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3F8C51E-D6ED-4505-817A-482069326EA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77B46157-D33B-4BF2-B7C6-6B22E560DFD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77B46157-D33B-4BF2-B7C6-6B22E560DFD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77B46157-D33B-4BF2-B7C6-6B22E560DFD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77B46157-D33B-4BF2-B7C6-6B22E560DFD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEBCC5F0-90D4-4549-B7AC-FFB8D2E0A9B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEBCC5F0-90D4-4549-B7AC-FFB8D2E0A9B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEBCC5F0-90D4-4549-B7AC-FFB8D2E0A9B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEBCC5F0-90D4-4549-B7AC-FFB8D2E0A9B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DB56DF5-DAF2-479A-87E2-BFB4E8659AE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DB56DF5-DAF2-479A-87E2-BFB4E8659AE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DB56DF5-DAF2-479A-87E2-BFB4E8659AE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DB56DF5-DAF2-479A-87E2-BFB4E8659AE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A449A2BD-FB70-4288-924D-A06789D9AB91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A449A2BD-FB70-4288-924D-A06789D9AB91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A449A2BD-FB70-4288-924D-A06789D9AB91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A449A2BD-FB70-4288-924D-A06789D9AB91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E465384A-6F4F-4521-81DE-8685B594439D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E465384A-6F4F-4521-81DE-8685B594439D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E465384A-6F4F-4521-81DE-8685B594439D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E465384A-6F4F-4521-81DE-8685B594439D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2655FC0-0589-4E39-A6F7-41E81651D531}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2655FC0-0589-4E39-A6F7-41E81651D531}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2655FC0-0589-4E39-A6F7-41E81651D531}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2655FC0-0589-4E39-A6F7-41E81651D531}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0564DB66-EACB-4F3F-8CDE-D212EB7C6764} = {C3A53411-DFA5-411E-8AC4-743140C7BFF7}
+		{A3F8C51E-D6ED-4505-817A-482069326EA8} = {C3A53411-DFA5-411E-8AC4-743140C7BFF7}
+		{77B46157-D33B-4BF2-B7C6-6B22E560DFD9} = {1C21BA95-6934-428B-960A-34B9F2A0A472}
+		{FEBCC5F0-90D4-4549-B7AC-FFB8D2E0A9B3} = {67D8FFCB-5860-45FD-88E6-4D6A8B3200E7}
+		{5DB56DF5-DAF2-479A-87E2-BFB4E8659AE8} = {67D8FFCB-5860-45FD-88E6-4D6A8B3200E7}
+		{A449A2BD-FB70-4288-924D-A06789D9AB91} = {A02DFDF8-71CA-4C9C-BBF0-B97A736D2887}
+		{E465384A-6F4F-4521-81DE-8685B594439D} = {67D8FFCB-5860-45FD-88E6-4D6A8B3200E7}
+		{B2655FC0-0589-4E39-A6F7-41E81651D531} = {67D8FFCB-5860-45FD-88E6-4D6A8B3200E7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CB483820-22F1-4E36-92AD-EBCC35C89C8E}
