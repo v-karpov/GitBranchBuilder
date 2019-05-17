@@ -36,6 +36,6 @@ namespace GitBranchBuilder.Pipelines
         /// </summary>
         /// <param name="options">Опции запуска задания</param>
         /// <returns></returns>
-        public abstract Task<Result> Run(StartOptions options);
+        public abstract Task<PipelineResult> Run(StartOptions options);
     }
 }

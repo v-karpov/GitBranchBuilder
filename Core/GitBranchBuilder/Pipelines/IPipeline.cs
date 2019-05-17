@@ -12,7 +12,7 @@ namespace GitBranchBuilder.Pipelines
         /// <summary>
         /// Выполняет работу в конвейере до конца
         /// </summary>
-        Task<Result> Run(StartOptions options);
+        Task<PipelineResult> Run(StartOptions options);
 
         /// <summary>
         /// Глобальные параметры обрабатывающих блоков

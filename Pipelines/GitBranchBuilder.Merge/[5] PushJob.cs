@@ -1,5 +1,5 @@
 ﻿using System;
-
+using CSharpFunctionalExtensions;
 using GitBranchBuilder.Components;
 using GitBranchBuilder.Jobs;
 using GitBranchBuilder.Providers;
@@ -10,7 +10,7 @@ using Microsoft.Build.Framework;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class PushJob : FinalJob<BuildEngineResult>, IMergeJob
+    public class PushJob : FinalJob<Result<BuildEngineResult>>, IMergeJob
     {
         public override string Description 
             => $"Pushing result into {RemoteName}/{Head.FriendlyName}";
@@ -27,7 +27,7 @@ namespace GitBranchBuilder.Pipelines.Merge
         {
             Prepare = buildResult =>
             {
-                if (!buildResult.Result)
+                if (!buildResult.IsSuccess)
                 {
                     Fault(new InvalidOperationException("No way to push unchecked branch."));
                     return;
@@ -42,7 +42,7 @@ namespace GitBranchBuilder.Pipelines.Merge
                 if (Head == defaultBranch.Value.Branch)
                 {
                     Fault(new InvalidOperationException("Unable to push into default protected branch"));
-                    return GitBranchBuilder.Result.Unknown;
+                    return PipelineResult.Unknown;
                 }
 
                 if (!Head.IsTracking)
@@ -61,7 +61,7 @@ namespace GitBranchBuilder.Pipelines.Merge
                         OnPushStatusError = err => Console.WriteLine(err)
                     });
 
-                return GitBranchBuilder.Result.Unknown;
+                return PipelineResult.Unknown;
             };
         }
     }

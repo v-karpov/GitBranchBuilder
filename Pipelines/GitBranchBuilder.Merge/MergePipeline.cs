@@ -3,7 +3,7 @@
 namespace GitBranchBuilder.Pipelines.Merge
 {
     /// <summary>
-    /// 
+    /// Интерфейс работы в конвейере слияния веток
     /// </summary>
     public interface IMergeJob : IJob
     {
@@ -15,6 +15,16 @@ namespace GitBranchBuilder.Pipelines.Merge
     /// </summary>
     public class MergePipeline : ConfigurablePipeline<IMergeJob>
     {
+        class FetchJob : FetchJob<StartOptions>, IStartJob, IMergeJob
+        {
+   
+        }
+
+        class BuildJob : RetryBuildJob<string>, IMergeJob
+        {
+            class Impl : BuildJobImpl { }
+        }
+
         /// <summary>
         /// Конфигуратор для конвейера <see cref="MergePipeline"/>
         /// </summary>
@@ -37,12 +47,6 @@ namespace GitBranchBuilder.Pipelines.Merge
                         .LinkTo(push)
                         .Result;
             }
-        }
-        
-        public MergePipeline(IPipelineConfigurator<IMergeJob> configurator)
-            : base(configurator)
-        {
-
         }
     }
 }

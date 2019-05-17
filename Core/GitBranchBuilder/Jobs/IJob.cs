@@ -17,14 +17,18 @@ namespace GitBranchBuilder.Jobs
     /// <summary>
     /// Интерфейс, описывающий блок работы
     /// </summary>
-    /// <typeparam name="TIn">Тип входных данных блока работы</typeparam>
-    public interface IJob<in TIn> : IJob, ITargetBlock<TIn>
+    /// <typeparam name="TInput">Тип входных данных блока работы</typeparam>
+    public interface IJob<in TInput> : IJob, ITargetBlock<TInput>
     {
         
     }
 
-    public interface IJob<in TIn, out TOut> : IJob<TIn>, ISourceBlock<TOut>
+    public interface IJob<in TInput, out TOutput> : IJob<TInput>, ISourceBlock<TOutput>
     {
-
+        /// <summary>
+        /// Производит выполнение работы в соответствии с ее параметрами
+        /// </summary>
+        /// <param name="input">Входные данные для подготовительного этапа</param>
+        TOutput Execute(TInput input);
     }
 }

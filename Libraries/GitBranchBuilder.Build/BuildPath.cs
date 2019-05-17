@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GitBranchBuilder
+﻿namespace GitBranchBuilder
 {
-    public class BuildPath
+    /// <summary>
+    /// Структура, описывающая путь к проекту сборки
+    /// </summary>
+    public struct BuildPath
     {
+        /// <summary>
+        /// Полный путь к проекту сборки
+        /// </summary>
         public string FullPath { get; set; }
     }
 }

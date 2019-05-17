@@ -7,9 +7,9 @@ namespace GitBranchBuilder.Jobs
     /// <summary>
     /// Нетипизированная работа, являющаяся концом конвейера
     /// </summary>
-    public interface IFinalJob : ISourceBlock<Result>
+    public interface IFinalJob : ISourceBlock<PipelineResult>
     {
-        Task<Result> Result { get; }
+        Task<PipelineResult> Result { get; }
     }
 
 
@@ -27,14 +27,14 @@ namespace GitBranchBuilder.Jobs
     /// </summary>
     /// <typeparam name="TInput">Входной тип данных</typeparam>
     public abstract class FinalJob<TInput> :
-        Job<TInput, Result>, IFinalJob<TInput>
+        Job<TInput, PipelineResult>, IFinalJob<TInput>
     {
         /// <summary>
         /// Результат выполнения данной ветви конвейера
         /// </summary>
-        public Task<Result> Result => CompletionSource.Task;
+        public Task<PipelineResult> Result => CompletionSource.Task;
 
-        public TaskCompletionSource<Result> CompletionSource { get; }
+        public TaskCompletionSource<PipelineResult> CompletionSource { get; }
 
         /// <summary>
         /// Блок, устанавливающий результат
@@ -43,12 +43,12 @@ namespace GitBranchBuilder.Jobs
 
         protected override ITargetBlock<TInput> TargetBlock => ResultSetter;
 
-        protected override ISourceBlock<Result> SourceBlock =>
+        protected override ISourceBlock<PipelineResult> SourceBlock =>
             throw new InvalidOperationException();
 
         public FinalJob() : base()
         {
-            CompletionSource = new TaskCompletionSource<Result>();
+            CompletionSource = new TaskCompletionSource<PipelineResult>();
             ResultSetter = new ActionBlock<TInput>(x => CompletionSource.SetResult(Execute(x)));
         }
     }

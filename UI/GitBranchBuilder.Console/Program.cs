@@ -21,31 +21,46 @@ namespace GitBranchBuilder
         {
             var builder = new ContainerBuilder();
 
+            builder.RegisterGeneric(typeof(DefaultProvider<>))
+                .As(typeof(IProvider<>))
+                .SingleInstance();
+
             void RegisterAssembly(Assembly assembly)
             {
+                IEnumerable<Type> SelectTargetTypes(Type type)
+                {
+#if DEBUG
+                    Console.WriteLine(type.FullName);
+#endif
+                    var interfaces = type.GetInterfaces()
+                        .Where(iface => !iface.FullName.StartsWith("System"));
+
+                    return interfaces;
+                }
+
                 builder.RegisterAssemblyTypes(assembly)
                     .Where(x => !(x.IsInterface || x.IsAbstract))
+                    .As(SelectTargetTypes)
                     .AsSelf()
-                    //.AsImplementedInterfaces()
-                    .As(t => t.GetInterfaces().Where(i => !i.FullName.StartsWith("System")))
                     .SingleInstance()
                     .PropertiesAutowired();
             }
 
+            void RegisterGenericSingleton(Type type)
+                => builder.RegisterGeneric(type).SingleInstance();
+
+            var generics = new[]
+            {
+                typeof(Holder<>),
+                typeof(MultiHolder<>),
+                typeof(MaybeHolder<>),
+            };
+
             var plugins = Directory
-                .GetFiles($"{Environment.CurrentDirectory}", "GitBranchBuilder*.dll", SearchOption.TopDirectoryOnly)
-                .Select(Assembly.LoadFile);
+              .GetFiles($"{Environment.CurrentDirectory}", "GitBranchBuilder*.dll", SearchOption.TopDirectoryOnly)
+              .Select(Assembly.LoadFile);
 
-            var types = plugins
-                .SelectMany(x => Autofac.Util.AssemblyExtensions.GetLoadableTypes(x));
-                         
-            builder.RegisterGeneric(typeof(Holder<>))
-                .SingleInstance();
-
-            builder.RegisterGeneric(typeof(DefaultProvider<>))
-                .As(typeof(IProvider<>))
-                .SingleInstance();
-               
+            generics.ForEach(RegisterGenericSingleton);
             plugins.ForEach(RegisterAssembly);
 
             return builder.Build();
@@ -64,7 +79,7 @@ namespace GitBranchBuilder
             // запуск всех конвейеров задач в асинхронном режиме
             Task RunPipelines()
             {
-                var tasks =  pipelines
+                var tasks = pipelines
                     .Select(provider => (provider, options: new StartOptions()))
                     .Select((data, index) =>
                     {

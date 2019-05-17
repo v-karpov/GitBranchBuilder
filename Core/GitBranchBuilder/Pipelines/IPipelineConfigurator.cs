@@ -6,6 +6,12 @@ using GitBranchBuilder.Jobs;
 namespace GitBranchBuilder.Pipelines
 {
     /// <summary>
+    /// Делегат, описывающий конфигуратор результата выполнения конвейера
+    /// </summary>
+    public delegate Task<PipelineResult> ResultConfigurator<TJob>(IConfigurablePipeline<TJob> pipeline)
+        where TJob : IJob;
+    
+    /// <summary>
     /// Интерфейс конфигуратора конвейера
     /// </summary>
     /// <typeparam name="TJob">Тип работ, выполняемых на ковейере</typeparam>
@@ -25,6 +31,6 @@ namespace GitBranchBuilder.Pipelines
         /// <summary>
         /// Действие конфигурации, выполняемое при настройке конвейера
         /// </summary>
-        Func<IConfigurablePipeline<TJob>, Task<Result>> ConfigureResult { get; }
+        ResultConfigurator<TJob> ConfigureResult { get; }
     }
 }

@@ -28,7 +28,7 @@ namespace GitBranchBuilder.Pipelines
         /// Функция конфигурации конвейера, возвращающая задачу,
         /// содержающую результат его выполнения
         /// </summary>
-        public Func<IConfigurablePipeline<TJob>, Task<Result>> ConfigureResult { get; protected set; }
+        public ResultConfigurator<TJob> ConfigureResult { get; protected set; }
 
         #region [Методы]
 

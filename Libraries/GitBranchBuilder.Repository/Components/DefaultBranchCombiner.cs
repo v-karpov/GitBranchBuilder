@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GitBranchBuilder.Core
+namespace GitBranchBuilder.Components
 {
     /// <summary>
     /// Объединитель веток по умолчанию

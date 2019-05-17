@@ -5,14 +5,14 @@ using System.Threading.Tasks.Dataflow;
 namespace GitBranchBuilder.Jobs
 {
     /// <summary>
-    /// Абстрактный класс, описывающий болк работы
+    /// Абстрактный класс, описывающий блок работы
     /// </summary>
     /// <typeparam name="TInput">Входной тип данных</typeparam>
     /// <typeparam name="TOutput">Тип результата</typeparam>
     public abstract class Job<TInput, TOutput> : IJob<TInput, TOutput>
     {
         /// <summary>
-        /// Описание работы, понятное для пользователя
+        /// Описание работы для вывода на экран
         /// </summary>
         public virtual string Description => $"{GetType().Name}";
 
@@ -33,33 +33,44 @@ namespace GitBranchBuilder.Jobs
         protected Action<TInput> Prepare { get; set; }
 
         /// <summary>
-        /// Выполняет подготовительный и непосредственный этапы работы
+        /// Обрабатывает автозавершение работы при ее успешном выполнении
+        /// </summary>
+        /// <param name="output">Результат, полученный в ходе выполнения работы</param>
+        protected virtual void ProcessAutocompletion(TOutput output)
+        {
+            if (Autocomplete)
+            {
+                (this as IDataflowBlock).Complete();
+            }
+        }
+
+        /// <summary>
+        /// Производит единичную попытку выполнить действие работы,
+        /// выполняет подготовительный и непосредственный этапы работы
         /// </summary>
         /// <param name="input">Входные данные для подготовительного этапа</param>
         /// <returns></returns>
-        protected virtual TOutput Execute(TInput input)
+        internal virtual TOutput ExecuteInternal(TInput input)
         {
-            try
-            {
-                Prepare?.Invoke(input);
+            Prepare?.Invoke(input);
 
-                // TODO: использовать NLog
-                Console.WriteLine($"{Description}");
+            // TODO: использовать NLog
+            Console.WriteLine($"{Description}");
 
-                var result = Process.Invoke();
+            return Process.Invoke();
+        }
 
-                if (Autocomplete)
-                {
-                    Complete();
-                }
+        /// <summary>
+        /// Производит выполнение работы в соответствии с ее параметрами
+        /// </summary>
+        /// <param name="input">Входные данные для подготовительного этапа</param>
+        /// <returns></returns>
+        public virtual TOutput Execute(TInput input)
+        {
+            var result = ExecuteInternal(input);
+            ProcessAutocompletion(result);
 
-                return result;
-            }
-            catch (Exception ex)
-            {
-                // TODO: использовать NLog
-                Console.WriteLine($"Unhandled exception: {ex.Message}");
-            }
+            return result;
         }
 
         /// <summary>
@@ -93,8 +104,6 @@ namespace GitBranchBuilder.Jobs
         /// Задача, сигнализирующая о завершении обработки данных блоком
         /// </summary>
         public virtual Task Completion => TargetBlock.Completion;
-
-        protected void Complete() => (this as IDataflowBlock).Complete();
 
         DataflowMessageStatus ITargetBlock<TInput>.OfferMessage(DataflowMessageHeader messageHeader, TInput messageValue, ISourceBlock<TInput> source, bool consumeToAccept)
             => TargetBlock.OfferMessage(messageHeader, messageValue, source, consumeToAccept);

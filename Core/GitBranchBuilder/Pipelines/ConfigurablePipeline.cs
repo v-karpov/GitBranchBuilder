@@ -15,28 +15,19 @@ namespace GitBranchBuilder.Pipelines
         /// <summary>
         /// Конфигуратор конвейера
         /// </summary>
-        public IPipelineConfigurator<TJob> Configurator { get; }
+        public IPipelineConfigurator<TJob> Configurator { get; set; }
 
         /// <summary>
         /// Запускает задание на конвейере с заданными опциями 
         /// </summary>
         /// <param name="options">Опции запуска задания</param>
         /// <returns></returns>
-        public override Task<Result> Run(StartOptions options)
+        public override Task<PipelineResult> Run(StartOptions options)
         {
             var result = Configurator.ConfigureResult(this);
 
             Configurator.Start.Post(options);
             return result;
-        }
-
-        /// <summary>
-        /// Конструктор по умолчанию
-        /// </summary>
-        /// <param name="pipelineConfigurator"></param>
-        public ConfigurablePipeline(IPipelineConfigurator<TJob> pipelineConfigurator)
-        {
-            Configurator = pipelineConfigurator;
         }
     }
 }
