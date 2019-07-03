@@ -27,7 +27,7 @@ namespace GitBranchBuilder
 
             void RegisterAssembly(Assembly assembly)
             {
-                IEnumerable<Type> SelectTargetTypes(Type type)
+                static IEnumerable<Type> SelectTargetTypes(Type type)
                 {
 #if DEBUG
                     Console.WriteLine(type.FullName);
@@ -54,6 +54,7 @@ namespace GitBranchBuilder
                 typeof(Holder<>),
                 typeof(MultiHolder<>),
                 typeof(MaybeHolder<>),
+                typeof(MaybeHolder<>.MaybeProvider)
             };
 
             var plugins = Directory
@@ -77,7 +78,7 @@ namespace GitBranchBuilder
             Console.ReadKey();
             
             // запуск всех конвейеров задач в асинхронном режиме
-            Task RunPipelines()
+            async Task RunPipelines()
             {
                 var tasks = pipelines
                     .Select(provider => (provider, options: new StartOptions()))
@@ -92,7 +93,7 @@ namespace GitBranchBuilder
                         return task.ContinueWith(x => provider.Dispose());
                     });
 
-                return Task.WhenAll(tasks);
+                await Task.WhenAll(tasks);
             }
 
             // вывод сообщений о состоянии выполнения конвейера

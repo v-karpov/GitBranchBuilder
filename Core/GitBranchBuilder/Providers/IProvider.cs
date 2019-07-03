@@ -38,6 +38,6 @@ namespace GitBranchBuilder.Providers
         /// Функция получения значения провайдера, реализованная через делегат <see cref="ValueGetter"/>
         /// </summary>
         /// <returns></returns>
-        public T GetValue() => ValueGetter();
+        public virtual T GetValue() => ValueGetter();
     }
 }

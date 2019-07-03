@@ -13,7 +13,7 @@ namespace GitBranchBuilder.Components
         /// <summary>
         /// Провайдер значения <see cref="Maybe{T}"/> из <see cref="T"/>
         /// </summary>
-        private class MaybeProvider : Provider<Maybe<T>>
+        public class MaybeProvider : Provider<Maybe<T>>
         {
             /// <summary>
             /// Конструктор, предоставляющий преобразование

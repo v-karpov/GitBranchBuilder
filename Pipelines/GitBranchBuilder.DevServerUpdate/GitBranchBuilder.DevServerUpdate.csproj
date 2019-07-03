@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>GitBranchBuilder</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\GitBranchBuilder.Build\GitBranchBuilder.Build.csproj" />
+    <ProjectReference Include="..\..\Libraries\GitBranchBuilder.GitLab\GitBranchBuilder.GitLab.csproj" />
+    <ProjectReference Include="..\..\Libraries\GitBranchBuilder.Repository\GitBranchBuilder.Repository.csproj" />
+  </ItemGroup>
+
+</Project>
