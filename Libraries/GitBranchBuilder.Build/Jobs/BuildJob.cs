@@ -34,7 +34,13 @@ namespace GitBranchBuilder.Jobs
             public BuildJobImpl(Action<TInput> prepareAction = default)
             {
                 Prepare = prepareAction ?? Prepare;
-                TryProcess = () => BuildProvider.GetValue();
+                TryProcess = () =>
+                {
+                    var result = BuildProvider.GetValue();
+                    return result.Result
+                        ? result
+                        : throw new InvalidOperationException();
+                };
             }
         }
 

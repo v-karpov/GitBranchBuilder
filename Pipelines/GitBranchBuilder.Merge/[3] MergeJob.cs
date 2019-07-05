@@ -44,6 +44,7 @@ namespace GitBranchBuilder.Pipelines.Merge
 
                 foreach (var sourceBranch in BranchesToMerge)
                 {
+                    var tip = repository.Head.Tip;
                     var result = repository.Value.Merge(sourceBranch, mergeSignature, mergeOptions);
 
                     Console.WriteLine();
@@ -53,7 +54,20 @@ namespace GitBranchBuilder.Pipelines.Merge
                         Console.WriteLine($"Unable to merge {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName} automatically");
                         Console.WriteLine($"INFO: {repository.Index.Conflicts.Count()} conflict(s) found. Resolve all the conflicts and press any key to continue...");
 
-                        Console.ReadKey();
+                        foreach (var conflict in repository.Value.Index.Conflicts)
+                        {
+                            Console.WriteLine(conflict.Ancestor.Path);
+                        }
+                        Console.WriteLine();
+
+                        if (Console.ReadKey(intercept: true).Key == ConsoleKey.U)
+                        {
+                            repository.Value.Reset(ResetMode.Hard, tip);
+                            result = repository.Value.Merge(sourceBranch, mergeSignature, new MergeOptions
+                            {
+                                MergeFileFavor = MergeFileFavor.Union
+                            });
+                        }
                     }
                     else
                     {
