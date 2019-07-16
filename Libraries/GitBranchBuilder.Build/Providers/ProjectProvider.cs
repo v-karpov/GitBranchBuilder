@@ -1,5 +1,4 @@
-﻿using GitBranchBuilder.Components;
-
+﻿using GitBranchBuilder.Components.Holders;
 using Microsoft.Build.Definition;
 using Microsoft.Build.Evaluation;
 

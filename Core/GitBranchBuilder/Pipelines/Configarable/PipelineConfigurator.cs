@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 using GitBranchBuilder.Jobs;
 
-namespace GitBranchBuilder.Pipelines
+namespace GitBranchBuilder.Pipelines.Configarable
 {
     /// <summary>
     /// Абстрактный конфигуратор конвейера работ
@@ -22,7 +20,7 @@ namespace GitBranchBuilder.Pipelines
         /// <summary>
         /// Начальная работа
         /// </summary>
-        public IStartJob Start { get; protected set; }
+        public IStartJob StartJob { get; protected set; }
 
         /// <summary>
         /// Функция конфигурации конвейера, возвращающая задачу,
@@ -57,7 +55,7 @@ namespace GitBranchBuilder.Pipelines
         /// <returns></returns>
         protected IReadOnlyCollection<T> FromSingle<T>(T element)
             => FromCollection(element);
-       
+
         #endregion
     }
 }

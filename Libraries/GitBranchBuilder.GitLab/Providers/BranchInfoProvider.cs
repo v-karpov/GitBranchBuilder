@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
-using GitBranchBuilder.Components;
-
+using GitBranchBuilder.Components.Holders;
+using GitBranchBuilder.Components.Holders.Specific;
 using NGitLab;
 using NGitLab.Models;
 

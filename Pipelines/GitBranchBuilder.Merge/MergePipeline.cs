@@ -1,4 +1,5 @@
 ﻿using GitBranchBuilder.Jobs;
+using GitBranchBuilder.Pipelines.Configarable;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
@@ -38,7 +39,7 @@ namespace GitBranchBuilder.Pipelines.Merge
                 PushJob push)
             {
                 JobCollection = FromJobs(prepareBranch, fetch, merge, build, push);
-                Start = new CombinedStartJob(FromCollection<IStartJob>(prepareBranch, fetch));
+                StartJob = new CombinedStartJob(FromCollection<IStartJob>(prepareBranch, fetch));
 
                 ConfigureResult = pipeline => 
                     pipeline.Join(prepareBranch, fetch, x => x.Item1)

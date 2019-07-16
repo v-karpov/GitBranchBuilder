@@ -1,4 +1,5 @@
-﻿using GitBranchBuilder.Providers;
+﻿using GitBranchBuilder.Components.Holders;
+using GitBranchBuilder.Providers;
 using LibGit2Sharp;
 
 namespace GitBranchBuilder.Components

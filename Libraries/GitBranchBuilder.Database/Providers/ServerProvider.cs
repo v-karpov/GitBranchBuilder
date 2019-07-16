@@ -1,5 +1,4 @@
-﻿using GitBranchBuilder.Components;
-
+﻿using GitBranchBuilder.Components.Holders;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 

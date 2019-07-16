@@ -46,8 +46,7 @@ namespace GitBranchBuilder.Jobs
         /// </summary>
         /// <param name="result">Ошибочный результат работы</param>
         protected virtual void FailureNotify(TResult result)
-            // TODO: использовать NLog
-            => Console.WriteLine($"Unable to proceed step {WrappedJob} because of failure");
+            =>Log.Warn($"Unable to proceed step {WrappedJob} because of failure");
            
         /// <summary>
         /// Производит выполнение работы в соответствии с ее параметрами

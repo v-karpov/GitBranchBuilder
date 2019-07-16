@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using GitBranchBuilder.Jobs;
 
-namespace GitBranchBuilder.Pipelines
+namespace GitBranchBuilder.Pipelines.Configarable
 {
     /// <summary>
     /// Делегат, описывающий конфигуратор результата выполнения конвейера
     /// </summary>
     public delegate Task<PipelineResult> ResultConfigurator<TJob>(IConfigurablePipeline<TJob> pipeline)
         where TJob : IJob;
-    
+
     /// <summary>
     /// Интерфейс конфигуратора конвейера
     /// </summary>
@@ -26,7 +26,7 @@ namespace GitBranchBuilder.Pipelines
         /// <summary>
         /// Работа, являющаяся началом конвейера
         /// </summary>
-        IStartJob Start { get; }
+        IStartJob StartJob { get; }
 
         /// <summary>
         /// Действие конфигурации, выполняемое при настройке конвейера

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders;
+using GitBranchBuilder.Components.Holders.Specific;
 using Microsoft.SqlServer.Management.Smo;
 
 namespace GitBranchBuilder.Providers

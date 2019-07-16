@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 using Autofac;
 
-using GitBranchBuilder.Components;
-using GitBranchBuilder.Pipelines;
+using GitBranchBuilder.Components.Holders;
 using GitBranchBuilder.Providers;
 
 using MoreLinq;
@@ -17,6 +16,9 @@ namespace GitBranchBuilder
 {
     class Program
     {
+#if DEBUG
+        static IList<string> loadedTypes = new List<string>();
+#endif
         static IContainer BuildAutofacContainer()
         {
             var builder = new ContainerBuilder();
@@ -30,7 +32,7 @@ namespace GitBranchBuilder
                 static IEnumerable<Type> SelectTargetTypes(Type type)
                 {
 #if DEBUG
-                    Console.WriteLine(type.FullName);
+                    loadedTypes.Add(type.FullName);
 #endif
                     var interfaces = type.GetInterfaces()
                         .Where(iface => !iface.FullName.StartsWith("System"));
@@ -64,55 +66,17 @@ namespace GitBranchBuilder
             generics.ForEach(RegisterGenericSingleton);
             plugins.ForEach(RegisterAssembly);
 
+            RegisterAssembly(Assembly.GetEntryAssembly());
+
             return builder.Build();
         }
      
         static async Task Main(string[] args)
         {
             using var container = BuildAutofacContainer();
-            var pipelines = container.Resolve<IEnumerable<IPipeline>>();
-            
-            await RunPipelines();
+            var application = container.Resolve<ConsoleApplication>();
 
-            Console.WriteLine("All job pipelines are ran to the end!");
-            Console.ReadKey();
-            
-            // запуск всех конвейеров задач в асинхронном режиме
-            async Task RunPipelines()
-            {
-                var tasks = pipelines
-                    .Select(provider => (provider, options: new StartOptions()))
-                    .Select((data, index) =>
-                    {
-                        var provider = data.provider;
-                        var task = Task.Run(() => provider.Run(data.options));
-
-                        ContinueWithLogs(task, index + 1, DateTime.Now);
-
-                        // освобождение ресурсов
-                        return task.ContinueWith(x => provider.Dispose());
-                    });
-
-                await Task.WhenAll(tasks);
-            }
-
-            // вывод сообщений о состоянии выполнения конвейера
-            static void ContinueWithLogs(Task task, int number, DateTime startTime)
-            {
-                var pipleineId = $"pipeline #{number}";
-
-                task.ContinueWith(x => Console.WriteLine(
-                    value: $"The {pipleineId} was finished successfully in {DateTime.Now - startTime}"),
-                    continuationOptions: TaskContinuationOptions.OnlyOnRanToCompletion);
-
-                task.ContinueWith(x => Console.WriteLine(
-                    value: $"Unable to finish {pipleineId} because of exception: {x.Exception}"),
-                    continuationOptions: TaskContinuationOptions.OnlyOnFaulted);
-
-                task.ContinueWith(x => Console.WriteLine(
-                    value: $"Execution of {pipleineId} was cancelled"),
-                    continuationOptions: TaskContinuationOptions.OnlyOnCanceled);
-            }
+            await application.Run(loadedTypes);
         }
     }
 }

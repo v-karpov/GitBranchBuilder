@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders;
 using LibGit2Sharp;
 
 using IRemoteBranchLookup = System.ValueTuple<LibGit2Sharp.Remote, System.Linq.ILookup<string, LibGit2Sharp.Branch>>;

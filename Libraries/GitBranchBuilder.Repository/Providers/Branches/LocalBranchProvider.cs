@@ -2,6 +2,7 @@
 using System.Linq;
 
 using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders;
 using LibGit2Sharp;
 
 using ILocalBranchLookup = System.Linq.ILookup<string, LibGit2Sharp.Branch>;

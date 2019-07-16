@@ -1,8 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
-
 using GitBranchBuilder.Providers;
 
-namespace GitBranchBuilder.Components
+namespace GitBranchBuilder.Components.Holders
 {
     /// <summary>
     /// Хранилище опциональных данных (использует тип <see cref="Maybe{T}"/>
@@ -52,7 +51,7 @@ namespace GitBranchBuilder.Components
         public MaybeHolder(IProvider<T> provider) :
             this(new MaybeProvider(provider))
         {
-           
+
         }
 
         /// <summary>

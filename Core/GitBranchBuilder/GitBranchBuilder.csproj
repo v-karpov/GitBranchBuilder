@@ -6,11 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" Version="4.6.*" />
+    <PackageReference Include="sharpconfig" Version="3.2.8" />
     <PackageReference Include="CSharpFunctionalExtensions" Version="1.18.1" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.9.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SharpConfig\SharpConfig.csproj" />
   </ItemGroup>
 </Project>

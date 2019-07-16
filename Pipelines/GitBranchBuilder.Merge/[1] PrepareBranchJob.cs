@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders;
 using GitBranchBuilder.Jobs;
 using NGitLab.Models;
 

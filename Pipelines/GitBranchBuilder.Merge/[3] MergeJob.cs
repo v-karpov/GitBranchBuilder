@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders.Specific;
 using GitBranchBuilder.Jobs;
 using GitBranchBuilder.Providers;
 
@@ -21,7 +22,8 @@ namespace GitBranchBuilder.Pipelines.Merge
         public MergeJob(RepositoryHolder repository,
                         ConfigurationHolder configuration,
                         IRemoteBranchProvider remoteBranches,
-                        ILocalBranchProvider localBranches)
+                        ILocalBranchProvider localBranches,
+                        IMergeApprovalService userApproval)
         {
             Prepare = data =>
             {
@@ -47,20 +49,19 @@ namespace GitBranchBuilder.Pipelines.Merge
                     var tip = repository.Head.Tip;
                     var result = repository.Value.Merge(sourceBranch, mergeSignature, mergeOptions);
 
-                    Console.WriteLine();
-
                     if (result.Status == MergeStatus.Conflicts)
                     {
-                        Console.WriteLine($"Unable to merge {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName} automatically");
-                        Console.WriteLine($"INFO: {repository.Index.Conflicts.Count()} conflict(s) found. Resolve all the conflicts and press any key to continue...");
+                        Log.Warn($"Unable to merge {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName} automatically");
+                        Log.Error($"{repository.Index.Conflicts.Count()} conflict(s) found:");
 
                         foreach (var conflict in repository.Value.Index.Conflicts)
                         {
-                            Console.WriteLine(conflict.Ancestor.Path);
+                            Log.Info(conflict.Ancestor.Path);
                         }
-                        Console.WriteLine();
 
-                        if (Console.ReadKey(intercept: true).Key == ConsoleKey.U)
+                        Log.Info("Resolve all the conflicts and press any key to continue...");
+  
+                        if (userApproval.RequstApprove("perform union merge").IsSuccess)
                         {
                             repository.Value.Reset(ResetMode.Hard, tip);
                             result = repository.Value.Merge(sourceBranch, mergeSignature, new MergeOptions
@@ -71,7 +72,7 @@ namespace GitBranchBuilder.Pipelines.Merge
                     }
                     else
                     {
-                        Console.WriteLine($"Merged successfully {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName}");
+                        Log.Info($"Merged successfully {sourceBranch.FriendlyName} into {TargetBranch.FriendlyName}");
                     }
                 }
 

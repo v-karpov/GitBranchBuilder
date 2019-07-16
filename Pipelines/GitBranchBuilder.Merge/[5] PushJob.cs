@@ -1,6 +1,7 @@
 ﻿using System;
 using CSharpFunctionalExtensions;
 using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders;
 using GitBranchBuilder.Jobs;
 using GitBranchBuilder.Providers;
 

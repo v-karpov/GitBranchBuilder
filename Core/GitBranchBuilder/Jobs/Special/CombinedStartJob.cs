@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks.Dataflow;
 
@@ -19,7 +20,7 @@ namespace GitBranchBuilder.Jobs
         /// Совмещенное описание дочерних работ
         /// </summary>
         protected string CombinedDescription
-            => string.Join("\r\n", "\t" + Jobs.Select(x => x.Description));
+            => string.Join(Environment.NewLine, "\t" + Jobs.Select(x => x.Description));
 
         /// <summary>
         /// Список дочерних работ

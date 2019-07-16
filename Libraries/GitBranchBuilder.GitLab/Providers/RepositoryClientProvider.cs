@@ -1,4 +1,4 @@
-﻿using GitBranchBuilder.Components;
+﻿using GitBranchBuilder.Components.Holders;
 using NGitLab;
 using NGitLab.Models;
 

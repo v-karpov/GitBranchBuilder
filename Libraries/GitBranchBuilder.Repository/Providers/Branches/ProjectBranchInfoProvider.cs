@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders.Specific;
 
 namespace GitBranchBuilder.Providers
 {

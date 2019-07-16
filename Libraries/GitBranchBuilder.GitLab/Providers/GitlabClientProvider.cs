@@ -1,4 +1,4 @@
-﻿using GitBranchBuilder.Components;
+﻿using GitBranchBuilder.Components.Holders.Specific;
 using NGitLab;
 
 namespace GitBranchBuilder.Providers.Gitlab

@@ -3,7 +3,7 @@ using System.Threading;
 
 using GitBranchBuilder.Providers;
 
-namespace GitBranchBuilder.Components
+namespace GitBranchBuilder.Components.Holders
 {
     /// <summary>
     /// Класс, описывающий держатель объекта <typeparamref name="T"/> на основе провайдера <see cref="IProvider{T}"/>

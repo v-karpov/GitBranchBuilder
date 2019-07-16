@@ -1,6 +1,7 @@
 ﻿using System;
-
+using GitBranchBuilder.Components.Holders;
 using LibGit2Sharp;
+using NLog;
 
 namespace GitBranchBuilder.Providers
 {
@@ -9,12 +10,11 @@ namespace GitBranchBuilder.Providers
         /// <summary>
         /// Конструктор по умолчанию
         /// </summary>
-        public FetchOptionsProvdier(ICredentialsProvider credentialsProvider)
+        public FetchOptionsProvdier(ICredentialsProvider credentialsProvider, Holder<ILogger> logger)
             => ValueGetter = () => new FetchOptions
             {
                 CredentialsProvider = credentialsProvider.GetValue,
-                // TODO: использовать NLog
-                OnProgress = str => { Console.WriteLine(str); return true; }
+                OnProgress = str => { logger.Value.Info(str); return true; }
             };
     }
 }

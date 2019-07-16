@@ -6,7 +6,7 @@ using System.Threading;
 
 using GitBranchBuilder.Providers;
 
-namespace GitBranchBuilder.Components
+namespace GitBranchBuilder.Components.Holders
 {
     /// <summary>
     /// Хранилище множества значений из различных реализаций провайдера

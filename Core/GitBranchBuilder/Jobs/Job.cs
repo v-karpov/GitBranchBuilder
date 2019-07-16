@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using GitBranchBuilder.Components.Holders;
+using NLog;
 
 namespace GitBranchBuilder.Jobs
 {
@@ -33,6 +35,16 @@ namespace GitBranchBuilder.Jobs
         protected Action<TInput> Prepare { get; set; }
 
         /// <summary>
+        /// Логгер для работы
+        /// </summary>
+        protected ILogger Log { get; private set; }
+
+        /// <summary>
+        /// Точка автоматической установки значения логгера
+        /// </summary>
+        public Holder<ILogger> LogHolder { set { Log = value.Value; } }
+
+        /// <summary>
         /// Обрабатывает автозавершение работы при ее успешном выполнении
         /// </summary>
         /// <param name="output">Результат, полученный в ходе выполнения работы</param>
@@ -53,9 +65,7 @@ namespace GitBranchBuilder.Jobs
         internal virtual TOutput ExecuteInternal(TInput input)
         {
             Prepare?.Invoke(input);
-
-            // TODO: использовать NLog
-            Console.WriteLine($"{Description}");
+            Log.Warn(Description);
 
             return Process.Invoke();
         }

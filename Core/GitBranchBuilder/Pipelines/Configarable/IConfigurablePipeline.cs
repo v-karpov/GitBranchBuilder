@@ -1,6 +1,6 @@
 ﻿using GitBranchBuilder.Jobs;
 
-namespace GitBranchBuilder.Pipelines
+namespace GitBranchBuilder.Pipelines.Configarable
 {
     /// <summary>
     /// Интерфейс конфигурируемого конвейера

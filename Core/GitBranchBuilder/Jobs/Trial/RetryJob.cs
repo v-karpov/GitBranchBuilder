@@ -20,7 +20,6 @@ namespace GitBranchBuilder.Jobs
     public abstract class RetryJob<TInput, TResult> : RetryJobBase<ITrialJob<TInput, Result<TResult>>, TInput, Result<TResult>>
     {
         protected override void FailureNotify(Result<TResult> result)
-            // TODO: использовать NLog
-            => Console.WriteLine($"Unable to proceed step {WrappedJob} because of {result.Error}");
+            => Log.Warn($"Unable to proceed step {WrappedJob} because of {result.Error}");
     }
 }

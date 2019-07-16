@@ -1,7 +1,5 @@
 ﻿using System;
-
-using GitBranchBuilder.Components;
-
+using GitBranchBuilder.Components.Holders.Specific;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using GitBranchBuilder.Jobs;
 using GitBranchBuilder.Jobs.Combined;
-using GitBranchBuilder.Pipelines;
+using GitBranchBuilder.Pipelines.Configarable;
 
 namespace GitBranchBuilder
 {

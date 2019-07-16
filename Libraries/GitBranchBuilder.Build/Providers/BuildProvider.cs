@@ -1,7 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-
-using GitBranchBuilder.Components;
-
+using GitBranchBuilder.Components.Holders;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
 

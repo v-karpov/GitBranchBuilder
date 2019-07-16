@@ -3,7 +3,7 @@ using System.Threading.Tasks.Dataflow;
 
 using GitBranchBuilder.Jobs;
 
-namespace GitBranchBuilder.Pipelines
+namespace GitBranchBuilder.Pipelines.Configarable
 {
     /// <summary>
     /// Конвейер, настраиваемый при помощи <see cref="IConfigurablePipeline{TJob}"/>
@@ -26,7 +26,7 @@ namespace GitBranchBuilder.Pipelines
         {
             var result = Configurator.ConfigureResult(this);
 
-            Configurator.Start.Post(options);
+            Configurator.StartJob.Post(options);
             return result;
         }
     }

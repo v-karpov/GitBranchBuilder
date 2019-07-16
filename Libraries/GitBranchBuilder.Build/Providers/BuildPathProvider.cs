@@ -1,6 +1,5 @@
 ﻿using System.IO;
-
-using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders.Specific;
 
 namespace GitBranchBuilder.Providers.Build
 {

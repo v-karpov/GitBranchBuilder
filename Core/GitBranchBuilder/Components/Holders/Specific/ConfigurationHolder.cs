@@ -1,7 +1,7 @@
 ﻿using GitBranchBuilder.Providers;
 using SharpConfig;
 
-namespace GitBranchBuilder.Components
+namespace GitBranchBuilder.Components.Holders.Specific
 {
     /// <summary>
     /// Базовый компонент, содержащий конфигурацию

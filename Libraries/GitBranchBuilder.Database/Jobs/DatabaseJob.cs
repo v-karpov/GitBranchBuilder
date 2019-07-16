@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders;
 using Microsoft.SqlServer.Management.Smo;
 
 namespace GitBranchBuilder.Jobs

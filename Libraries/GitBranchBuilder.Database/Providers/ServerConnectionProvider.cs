@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
-using GitBranchBuilder.Components;
-
+using GitBranchBuilder.Components.Holders;
 using Microsoft.SqlServer.Management.Common;
 
 namespace GitBranchBuilder.Providers
