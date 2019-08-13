@@ -27,7 +27,8 @@ namespace GitBranchBuilder.Jobs
         /// <summary>
         /// Функция, возвращающая заполненный блок <see cref="IPropagatorBlock{TInput, TOutput}"/>
         /// </summary>
-        protected virtual IPropagatorBlock<TInput, TOutput> GetPropagatorBlock() => default;
+        protected virtual IPropagatorBlock<TInput, TOutput> GetPropagatorBlock() 
+            => new TransformBlock<TInput, TOutput>(Execute);
 
         /// <summary>
         /// Конструктор по умолчанию
@@ -36,7 +37,7 @@ namespace GitBranchBuilder.Jobs
             => PropagatorBlock = propagatorBlock;
 
         protected PropagationJob() : this(null)
-           => PropagatorBlock = GetPropagatorBlock() ?? new TransformBlock<TInput, TOutput>(Execute);
+           => PropagatorBlock = GetPropagatorBlock();
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ using CSharpFunctionalExtensions;
 namespace GitBranchBuilder.Jobs
 {
     /// <summary>
-    /// Авбстрактный класс, описывающий работу, которая может завершиться неуспешно, но может быть перезапущена
+    /// Абстрактный класс, описывающий работу, которая может завершиться неуспешно, но может быть перезапущена
     /// </summary>
     /// <typeparam name="TInput">Тип входных данных</typeparam>
     public abstract class RetryJob<TInput> : RetryJobBase<ITrialJob<TInput, Result>, TInput, Result>
@@ -13,7 +13,7 @@ namespace GitBranchBuilder.Jobs
     }
 
     /// <summary>
-    /// Авбстрактный класс, описывающий работу, которая может завершиться неуспешно, но может быть перезапущена
+    /// Абстрактный класс, описывающий работу, которая может завершиться неуспешно, но может быть перезапущена
     /// </summary>
     /// <typeparam name="TInput">Тип входных данных</typeparam>
     /// <typeparam name="TResult">Тип результаа</typeparam>

@@ -37,7 +37,7 @@ namespace GitBranchBuilder.Jobs
         /// <summary>
         /// Логгер для работы
         /// </summary>
-        protected ILogger Log { get; private set; }
+        protected ILogger Log { get; set; }
 
         /// <summary>
         /// Точка автоматической установки значения логгера
@@ -125,11 +125,14 @@ namespace GitBranchBuilder.Jobs
         /// 
         /// </summary>
         /// <param name="exception"></param>
-        protected void Fault(Exception exception)
-            => TargetBlock.Fault(exception);
+        protected Exception Fatal(Exception exception)
+        {
+            TargetBlock.Fault(exception);
+            return exception;
+        }
 
         void IDataflowBlock.Fault(Exception exception)
-            => Fault(exception);
+            => Fatal(exception);
 
         #endregion
 

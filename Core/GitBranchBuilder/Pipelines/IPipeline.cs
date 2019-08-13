@@ -12,7 +12,7 @@ namespace GitBranchBuilder.Pipelines
         /// <summary>
         /// Выполняет работу в конвейере до конца
         /// </summary>
-        Task<PipelineResult> Run(StartOptions options);
+        Task Run();
 
         /// <summary>
         /// Глобальные параметры обрабатывающих блоков
@@ -28,5 +28,18 @@ namespace GitBranchBuilder.Pipelines
         /// Глобальные параметры связи блоков в конвейере
         /// </summary>
         DataflowLinkOptions LinkOptions { get; }
+    }
+
+    /// <summary>
+    /// Интерфейс, описывающий последовательность работ
+    /// </summary>
+    /// <typeparam name="TIn">Тип входных данных конвейера</typeparam>
+    /// <typeparam name="TResult">Тип результата конвейера</typeparam>
+    public interface IPipeline<TIn, TResult> : IPipeline
+    {
+        /// <summary>
+        /// Выполняет работу в конвейере до конца
+        /// </summary>
+        Task<TResult> Run(TIn options);
     }
 }

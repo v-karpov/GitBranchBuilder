@@ -14,7 +14,7 @@ namespace GitBranchBuilder.Jobs
         where TResult : IResult
     {
         /// <summary>
-        /// Работа, обернутая 
+        /// Работа, обернутая данным классом
         /// </summary>
         public TJob WrappedJob { get; set; }
 
@@ -46,7 +46,7 @@ namespace GitBranchBuilder.Jobs
         /// </summary>
         /// <param name="result">Ошибочный результат работы</param>
         protected virtual void FailureNotify(TResult result)
-            =>Log.Warn($"Unable to proceed step {WrappedJob} because of failure");
+            => Log.Error($"Unable to proceed step {WrappedJob} because of failure");
            
         /// <summary>
         /// Производит выполнение работы в соответствии с ее параметрами
@@ -67,7 +67,7 @@ namespace GitBranchBuilder.Jobs
             return result;
 
             bool GetRetryApproval() => 
-                (retryStepsLeft.HasValue && retryStepsLeft > 0) || 
+                (retryStepsLeft.HasValue && retryStepsLeft-- > 0) || 
                 UserRetryApproval.RequstApprove(QuestionMessage).IsSuccess;
         }
     }
