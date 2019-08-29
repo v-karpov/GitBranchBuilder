@@ -11,59 +11,60 @@ using Microsoft.Build.Framework;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class PushJob : FinalJob<Result<BuildEngineResult>>, IMergeJob
+    public class PushJob : RetryJob<Result<BuildEngineResult>>
     {
-        public override string Description 
-            => $"Pushing result into {RemoteName}/{Head.FriendlyName}";
-
-        public string RemoteName { get; set; }
-
-        public Branch Head { get; set; }
-
-        public PushJob(
-            RepositoryHolder repository,
-            Holder<Remote> remote,
-            ICredentialsProvider credentialsProvider,
-            Holder<DefaultBranchInfo> defaultBranch)
+        public class PushJobImpl : TrialJob<Result<BuildEngineResult>>
         {
-            Prepare = buildResult =>
+            public override string Description
+                => $"Pushing result into {RemoteName}/{Head.FriendlyName}";
+
+            public string RemoteName { get; set; }
+
+            public Branch Head { get; set; }
+
+            public PushJobImpl(
+                RepositoryHolder repository,
+                Holder<Remote> remote,
+                ICredentialsProvider credentialsProvider,
+                Holder<DefaultBranchInfo> defaultBranch)
             {
-                if (!buildResult.IsSuccess)
+                Prepare = buildResult =>
                 {
-                    Fault(new InvalidOperationException("No way to push unchecked branch."));
-                    return;
-                }
-
-                RemoteName = remote.Value.Name;
-                Head = repository.Value.Head;
-            };
-
-            Process = () =>
-            {
-                if (Head == defaultBranch.Value.Branch)
-                {
-                    Fault(new InvalidOperationException("Unable to push into default protected branch"));
-                    return PipelineResult.Unknown;
-                }
-
-                if (!Head.IsTracking)
-                {
-                    repository.Branches.Update(Head,
-                        x => x.Remote = RemoteName,
-                        x => x.UpstreamBranch = Head.CanonicalName);
-                }
-
-                repository.Network.Push(
-                    branch: Head,
-                    pushOptions: new PushOptions
+                    if (!buildResult.IsSuccess)
                     {
-                        CredentialsProvider = credentialsProvider.GetValue,
-                        PackbuilderDegreeOfParallelism = Environment.ProcessorCount,
-                        OnPushStatusError = err => Console.WriteLine(err)
-                    });
+                        throw Fatal(new InvalidOperationException("No way to push unchecked branch."));
+                    }
 
-                return PipelineResult.Unknown;
-            };
+                    RemoteName = remote.Value.Name;
+                    Head = repository.Value.Head;
+                };
+
+                Process = () =>
+                {
+                    if (Head == defaultBranch.Value.Branch)
+                    {
+                        throw Fatal(new InvalidOperationException("Unable to push into default protected branch"));
+                    }
+
+                    if (!Head.IsTracking)
+                    {
+                        repository.Branches.Update(Head,
+                            x => x.Remote = RemoteName,
+                            x => x.UpstreamBranch = Head.CanonicalName);
+                    }
+
+                    repository.Network.Push(
+                        branch: Head,
+                        pushOptions: new PushOptions
+                        {
+                            CredentialsProvider = credentialsProvider.GetValue,
+                            PackbuilderDegreeOfParallelism = Environment.ProcessorCount,
+                            OnPushStatusError = err => Console.WriteLine(err)
+                        });
+
+                    return Result.Ok();
+                };
+            }
         }
     }
 }

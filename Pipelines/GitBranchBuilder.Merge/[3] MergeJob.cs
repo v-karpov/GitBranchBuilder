@@ -11,7 +11,7 @@ using LibGit2Sharp;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
-    public class MergeJob : PropagationJob<MergeBranchData, string>, IMergeJob
+    public class MergeJob : PropagationJob<MergeBranchData, string>
     {
         public override string Description => $"Merging actual branches into {TargetBranch.FriendlyName}";
 

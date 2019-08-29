@@ -56,7 +56,9 @@ namespace GitBranchBuilder
                 typeof(Holder<>),
                 typeof(MultiHolder<>),
                 typeof(MaybeHolder<>),
-                typeof(MaybeHolder<>.MaybeProvider)
+                typeof(MaybeHolder<>.MaybeProvider),
+                typeof(Jobs.FetchJob<>),
+                typeof(Jobs.RetryBuildJob<>),
             };
 
             var plugins = Directory

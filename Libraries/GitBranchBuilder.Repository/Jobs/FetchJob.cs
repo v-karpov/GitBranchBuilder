@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
 using CSharpFunctionalExtensions;
+
 using GitBranchBuilder.Components;
 using GitBranchBuilder.Components.Holders;
+
 using LibGit2Sharp;
 
 namespace GitBranchBuilder.Jobs

@@ -1,36 +1,30 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks.Dataflow;
 
-using GitBranchBuilder.Jobs;
+using CSharpFunctionalExtensions;
 
 namespace GitBranchBuilder.Pipelines.Configarable
 {
     /// <summary>
     /// Делегат, описывающий конфигуратор результата выполнения конвейера
     /// </summary>
-    public delegate Task<PipelineResult> ResultConfigurator<TJob>(IConfigurablePipeline<TJob> pipeline)
-        where TJob : IJob;
+    public delegate ISourceBlock<TResult> ResultConfigurator<TIn, TResult>(IConfigurablePipeline<TIn, TResult> pipeline)
+        where TResult : IResult;
 
     /// <summary>
     /// Интерфейс конфигуратора конвейера
     /// </summary>
     /// <typeparam name="TJob">Тип работ, выполняемых на ковейере</typeparam>
-    public interface IPipelineConfigurator<TJob>
-        where TJob : IJob
+    public interface IPipelineConfigurator<TIn, TResult>
+        where TResult : IResult
     {
         /// <summary>
-        /// Список всех этапов конвейера
+        /// Начальный блок конвейера
         /// </summary>
-        IReadOnlyCollection<TJob> JobCollection { get; }
-
-        /// <summary>
-        /// Работа, являющаяся началом конвейера
-        /// </summary>
-        IStartJob StartJob { get; }
+        ITargetBlock<TIn> Start { get; }
 
         /// <summary>
         /// Действие конфигурации, выполняемое при настройке конвейера
         /// </summary>
-        ResultConfigurator<TJob> ConfigureResult { get; }
+        ResultConfigurator<TIn, TResult> ConfigureResult { get; }
     }
 }

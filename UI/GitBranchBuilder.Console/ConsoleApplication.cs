@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using CSharpFunctionalExtensions;
 using GitBranchBuilder.Components.Holders;
 using GitBranchBuilder.Components.Services;
 using GitBranchBuilder.Pipelines;
-
+using GitBranchBuilder.Pipelines.Merge;
 using MoreLinq;
 
 using NLog;
@@ -51,37 +51,28 @@ namespace GitBranchBuilder
             async Task RunPipelines()
             {
                 var tasks = Pipelines
-                    .Select(provider => (provider, options: new StartOptions()))
-                    .Select((data, index) =>
-                    {
-                        var provider = data.provider;
-                        var task = Task.Run(() => provider.Run(data.options));
-
-                        ContinueWithLogs(task, index + 1, DateTime.Now);
-
-                        // освобождение ресурсов
-                        return task.ContinueWith(x => provider.Dispose());
-                    });
+                    .Select(provider => Task.Run(provider.Run))
+                    .Select((task, index) => ContinueWithLogs(task, $"pipeline #{index + 1}", DateTime.Now));
 
                 await Task.WhenAll(tasks);
             }
 
             // вывод сообщений о состоянии выполнения конвейера
-            void ContinueWithLogs(Task task, int number, DateTime startTime)
+            Task ContinueWithLogs(Task task, string pipleineId, DateTime startTime)
             {
-                var pipleineId = $"pipeline #{number}";
-
-                task.ContinueWith(x => Logger.Info(
+                var onCompletion = task.ContinueWith(x => Logger.Info(
                     value: $"The {pipleineId} was finished successfully in {DateTime.Now - startTime}"),
                     continuationOptions: TaskContinuationOptions.OnlyOnRanToCompletion);
 
-                task.ContinueWith(x => Logger.Fatal(
+                var onError = task.ContinueWith(x => Logger.Fatal(
                     value: $"Unable to finish {pipleineId} because of exception: {x.Exception}"),
                     continuationOptions: TaskContinuationOptions.OnlyOnFaulted);
 
-                task.ContinueWith(x => Logger.Error(
+                var onCancelled = task.ContinueWith(x => Logger.Error(
                     value: $"Execution of {pipleineId} was cancelled"),
                     continuationOptions: TaskContinuationOptions.OnlyOnCanceled);
+
+                return Task.WhenAny(onCompletion, onError, onCancelled);
             }
         }
 

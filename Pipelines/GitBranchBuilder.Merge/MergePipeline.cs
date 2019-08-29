@@ -1,52 +1,45 @@
-﻿using GitBranchBuilder.Jobs;
+﻿using System.Threading.Tasks.Dataflow;
+using CSharpFunctionalExtensions;
+using GitBranchBuilder.Components;
+using GitBranchBuilder.Components.Holders;
+using GitBranchBuilder.Jobs;
 using GitBranchBuilder.Pipelines.Configarable;
+using GitBranchBuilder.Providers;
+using LibGit2Sharp;
 
 namespace GitBranchBuilder.Pipelines.Merge
 {
     /// <summary>
-    /// Интерфейс работы в конвейере слияния веток
-    /// </summary>
-    public interface IMergeJob : IJob
-    {
-
-    }
-
-    /// <summary>
     /// Конвейер, выполняющий слияние веток
     /// </summary>
-    public class MergePipeline : ConfigurablePipeline<IMergeJob>
+    public class MergePipeline : ConfigurablePipeline
     {
-        class FetchJob : FetchJob<StartOptions>, IStartJob, IMergeJob
-        {
-   
-        }
+        public class FetchJob : FetchJob<Result> { }
 
-        class BuildJob : RetryBuildJob<string>, IMergeJob
+        public class BuildJob : RetryBuildJob<string>
         {
-            class Impl : BuildJobImpl { }
+            public class Impl : BuildJobImpl { }
         }
 
         /// <summary>
         /// Конфигуратор для конвейера <see cref="MergePipeline"/>
         /// </summary>
-        private class PipelineConfigurator : PipelineConfigurator<IMergeJob>
+        private class Config : PipelineConfigurator
         {
-            public PipelineConfigurator(
+            public Config(
                 PrepareBranchJob prepareBranch,
                 FetchJob fetch,
                 MergeJob merge,
                 BuildJob build,
                 PushJob push)
             {
-                JobCollection = FromJobs(prepareBranch, fetch, merge, build, push);
-                StartJob = new CombinedStartJob(FromCollection<IStartJob>(prepareBranch, fetch));
+                Start = Broadcast(prepareBranch, fetch);
 
-                ConfigureResult = pipeline => 
-                    pipeline.Join(prepareBranch, fetch, x => x.Item1)
+                ConfigureResult = pipeline =>
+                   pipeline.Join(prepareBranch, fetch, x => x.Item1)
                         .LinkTo(merge)
                         .LinkTo(build)
-                        .LinkTo(push)
-                        .Result;
+                        .LinkTo(push);
             }
         }
     }

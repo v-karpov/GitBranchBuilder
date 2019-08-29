@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Threading.Tasks.Dataflow;
+
+using CSharpFunctionalExtensions;
 
 using GitBranchBuilder.Jobs;
 
@@ -8,54 +9,57 @@ namespace GitBranchBuilder.Pipelines.Configarable
     /// <summary>
     /// Абстрактный конфигуратор конвейера работ
     /// </summary>
-    /// <typeparam name="TJob"></typeparam>
-    public abstract class PipelineConfigurator<TJob> : IPipelineConfigurator<TJob>
-        where TJob : IJob
+    public abstract class PipelineConfigurator : PipelineConfigurator<Result>
+    {
+
+    }
+
+    /// <summary>
+    /// Абстрактный конфигуратор конвейера работ
+    /// </summary>
+    /// <typeparam name="TJob">Тип работ, выполняемых на конвейере</typeparam>
+    /// <typeparam name="TResult">Тип результата конвейера</typeparam>
+    public abstract class PipelineConfigurator<TResult> : PipelineConfigurator<Result, TResult>
+        where TResult : IResult
+    {
+
+    }
+
+    /// <summary>
+    /// Абстрактный конфигуратор конвейера работ
+    /// </summary>
+    /// <typeparam name="TJob">Тип работ, выполняемых на конвейере</typeparam>
+    /// <typeparam name="TIn">Тип входных данных конвейера</typeparam>
+    /// <typeparam name="TResult">Тип результата конвейера</typeparam>
+    public abstract class PipelineConfigurator<TIn, TResult> : IPipelineConfigurator<TIn, TResult>
+        where TResult : IResult
     {
         /// <summary>
-        /// Список всех работ конвейера
+        /// Начальный блок конвейера
         /// </summary>
-        public IReadOnlyCollection<TJob> JobCollection { get; protected set; }
-
-        /// <summary>
-        /// Начальная работа
-        /// </summary>
-        public IStartJob StartJob { get; protected set; }
+        public ITargetBlock<TIn> Start { get; protected set; }
 
         /// <summary>
         /// Функция конфигурации конвейера, возвращающая задачу,
         /// содержающую результат его выполнения
         /// </summary>
-        public ResultConfigurator<TJob> ConfigureResult { get; protected set; }
-
-        #region [Методы]
+        public ResultConfigurator<TIn, TResult> ConfigureResult { get; protected set; }
 
         /// <summary>
-        /// Создает коллекцию, доступную только для чтения, из массива объектов
+        /// Создает широковещательный блок, рассылающий входные данные на все указанные работы
         /// </summary>
-        /// <typeparam name="T">Тип объектов коллекции</typeparam>
-        /// <param name="values">Массив объектов, из которых необходимо создать коллекцию</param>
+        /// <param name="jobs">Список работ, куда требуется разослать данные</param>
         /// <returns></returns>
-        protected IReadOnlyCollection<T> FromCollection<T>(params T[] values)
-            => new ReadOnlyCollection<T>(values);
+        protected BroadcastBlock<TIn> Broadcast(params IJob<TIn>[] jobs)
+        {
+            var broadcast = new BroadcastBlock<TIn>(x => x);
 
-        /// <summary>
-        /// Создает коллекцию работ, доступную только для чтения, из указанного массива работ
-        /// </summary>
-        /// <param name="jobs">Массив работ, из которых необходимо создать коллекцию</param>
-        /// <returns></returns>
-        protected IReadOnlyCollection<TJob> FromJobs(params TJob[] jobs)
-            => FromCollection(jobs);
+            foreach (var job in jobs)
+            {
+                broadcast.LinkTo(job);
+            }
 
-        /// <summary>
-        /// Создает коллекцию с единственным элементом
-        /// </summary>
-        /// <typeparam name="T">Тип объектов коллекции</typeparam>
-        /// <param name="element">Элемент, который нужно представить в виде коллекции</param>
-        /// <returns></returns>
-        protected IReadOnlyCollection<T> FromSingle<T>(T element)
-            => FromCollection(element);
-
-        #endregion
+            return broadcast;
+        }
     }
 }

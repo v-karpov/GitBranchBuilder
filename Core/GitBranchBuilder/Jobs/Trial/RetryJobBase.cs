@@ -1,5 +1,5 @@
-﻿using System;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
+
 using GitBranchBuilder.Components;
 
 namespace GitBranchBuilder.Jobs
@@ -63,6 +63,8 @@ namespace GitBranchBuilder.Jobs
                 FailureNotify(result);
                 result = ExecuteInternal(input);
             }
+
+            ProcessAutocompletion(result);
 
             return result;
 
